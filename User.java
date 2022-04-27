@@ -4,8 +4,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class User {
@@ -14,19 +15,27 @@ public class User {
     String username;
     String password;
 
+    /**
+     * Prompts user to signup with username and password 
+     */
     public void signup() {
+        Map<String, String> users = readUsers();
         String newUsername;
         String newPassword;
-        List<String> users = readUsers();
 
+        // gets username until a unique username is inputted
         do {
             System.out.print("Enter username: ");
             newUsername = kb.nextLine();
 
-            if(userExists(users, newUsername))
-                System.out.println("\nUsername already exists.\n");
-        } while(userExists(users, newUsername));
+            if(newUsername.length() < 1)
+                System.out.println("\nUsername is too short.\n");
 
+            if(users.containsKey(newUsername))
+                System.out.println("\nUsername already exists.\n");
+        } while(users.containsKey(newUsername) || newUsername.length() < 1);
+
+        // gets password that is longer than 1 character
         do {
             System.out.print("Enter password: ");
             newPassword = kb.nextLine();
@@ -41,41 +50,52 @@ public class User {
         password = newPassword;
     }
 
+    /**
+     * Prompts user to login with username and password
+     */
     public void login() {
-        List<String> users = readUsers();
+        Map<String,String> users = readUsers();
         String newUsername;
         String newPassword;
+        int attempts = 0;
 
+        // gets username that must exist, 3 attempts are given to user
         do {
             System.out.print("Enter username: ");
             newUsername = kb.nextLine();
+            attempts++;
 
-            if(!userExists(users, newUsername))
+            if(attempts == 3)
+                return;
+
+            if(!users.containsKey(newUsername))
                 System.out.println("\nUsername does not exist.\n");
-        } while(!userExists(users, newUsername));
+        } while(!users.containsKey(newUsername));
 
+        attempts = 0;
+
+        // gets password that must match username password, 3 attempts are given to user
         do {
             System.out.print("Enter password: ");
             newPassword = kb.nextLine();
+            attempts++;
 
-            if(!correctPassword(users, newPassword))
+            if(attempts == 3)
+                return;
+
+            if(!users.get(newUsername).equals(newPassword))
                 System.out.println("\nIncorrect password.\n");
-        } while(!correctPassword(users, newPassword));
+        } while(!users.get(newUsername).equals(newPassword));
 
         username = newUsername;
         password = newPassword;
     }
 
-    private boolean correctPassword(List<String> users, String newPassword) {
-        for(String user : users) {
-            String password = user.split(":")[1];
-
-            if(password.equals(newPassword))
-                return true;
-        }
-        return false;
-    }
-
+    /**
+     * Adds a new user to the file and creates a directory for the user
+     * @param newUsername
+     * @param newPassword
+     */
     private void addUser(String newUsername, String newPassword) {
         File file = new File("users.txt");
 
@@ -90,27 +110,22 @@ public class User {
         new File(newUsername).mkdir();
     }
 
-    private boolean userExists(List<String> users, String newUsername) {
-        for(String user : users) {
-            String username = user.split(":")[0];
-
-            if(username.equals(newUsername))
-                return true;
-        }  
-
-        return false;
-    }
-
-    private List<String> readUsers() {
-        List<String> users = new ArrayList<>();
+    /**
+     * Reads all users that exist
+     * @return
+     */
+    private Map<String, String> readUsers() {
+        Map<String, String> users = new HashMap<>();
 
         if(new File("users.txt").exists()) {
             try {
                 Path filePath = Paths.get("users.txt");
-
-                users = Files.readAllLines(filePath);
+                List<String> lines = Files.readAllLines(filePath);
     
-    
+                for(String user : lines) {
+                    String[] split = user.split(":");
+                    users.put(split[0], split[1]);
+                }
             } catch(IOException e) {
                 System.out.println("\nError.\n");
             }

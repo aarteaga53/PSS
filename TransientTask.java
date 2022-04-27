@@ -7,6 +7,9 @@ public class TransientTask extends Task {
         this.date = date;
     }
 
+    /**
+     * Converts the task to JSON
+     */
     public String convertJSON() {
         return "\t{\n\t\t\"Name\" : \"" + name + "\",\n" +
                 "\t\t\"Type\" : \"" + type + "\",\n" +

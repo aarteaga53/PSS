@@ -6,15 +6,22 @@ import java.util.Scanner;
 
 public class DataFile {
 
+    /**
+     * Writes tasks to a file
+     * @param filename
+     * @param tasks
+     */
     public void write(String filename, ArrayList<Task> tasks) {
         try {
             File file = new File(filename);
             FileWriter fw = new FileWriter(file);
             String text = "[\n";
 
+            // converts every task to json format
             for(int i = 0; i < tasks.size(); i++) {
                 text += tasks.get(i).convertJSON();
 
+                // if it is not the last task, add comma
                 if(i != tasks.size() - 1)
                     text += ",\n";
             }
@@ -26,6 +33,11 @@ public class DataFile {
         }
     }
 
+    /**
+     * Reads tasks from a file
+     * @param tasks
+     * @param filename
+     */
     public void read(ArrayList<Task> tasks, String filename) {
         ArrayList<Task> newTasks = new ArrayList<>();
         String name = "";
@@ -46,6 +58,7 @@ public class DataFile {
                 if(line.equals("[") || line.equals("]") || line.equals("\t{"))
                     continue;
 
+                // creates a new task if the necessary variables have been read for a specific task type
                 if(line.equals("\t},") || line.equals("\t}")) {
                     Task newTask;
 
@@ -64,17 +77,20 @@ public class DataFile {
 
                     int i;
 
+                    // checks that no task has the same name
                     for(i = 0; i < tasks.size(); i++) {
                         if(tasks.get(i).name.equals(newTask.name))
                             break;
                     }
 
+                    // adds a new task if it is not a repeat
                     if(i == tasks.size())
-                            tasks.add(newTask);
+                        tasks.add(newTask);
                 }
                 else {
                     String[] split = line.split(" : ");
 
+                    // checks key and reads the value
                     if(split[0].equals("\t\t\"Name\""))
                         name = split[1].substring(split[1].indexOf("\"") + 1, split[1].lastIndexOf("\""));
                     else if(split[0].equals("\t\t\"Type\""))

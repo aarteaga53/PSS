@@ -18,7 +18,7 @@ public class Main {
             if(option == 'b')
                 user.signup();
 
-            if(!user.username.equals(null))
+            if(user.username != null)
                 break;
         }
 

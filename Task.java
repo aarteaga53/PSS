@@ -16,15 +16,27 @@ public class Task {
         this.duration = duration;
     }
 
+    /**
+     * Checks if the task is Anti
+     * @return
+     */
     public boolean isAnti() {
         return type.equals("Cancellation");
     }
 
+    /**
+     * Checks if the task is Transient
+     * @return
+     */
     public boolean isTransient() {
         return type.equals("Visit") || 
                 type.equals("Shopping") || type.equals("Appointment");
     }
 
+    /**
+     * Checks if the task is Recurring
+     * @return
+     */
     public boolean isRecurring() {
         return type.equals("Class") ||
                 type.equals("Study") || type.equals("Sleep") ||
@@ -32,6 +44,11 @@ public class Task {
                 type.equals("Work") || type.equals("Meal");
     }
 
+    /**
+     * Converts the date to be user readable
+     * @param date
+     * @return
+     */
     public String dateConversion(int date) {
         String d = String.valueOf(date);
         return d.substring(4, 6) + "/" + d.substring(6, 8) + "/" + d.substring(0, 4);
