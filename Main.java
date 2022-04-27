@@ -9,7 +9,15 @@ public class Main {
         User user = new User();
 
         while(true) {
-            user.login();
+            System.out.print("a) Login\nb) Signup\nEnter option: ");
+            char option = kb.nextLine().toLowerCase().charAt(0);
+
+            if(option == 'a')
+                user.login();
+
+            if(option == 'b')
+                user.signup();
+
             if(!user.username.equals(null))
                 break;
         }
