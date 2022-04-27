@@ -63,7 +63,7 @@ public class PSS {
         do {
             System.out.print("Enter task duration(hh:mm): ");
             duration = kb.nextLine();
-        } while(isDurationCorrect(duration));
+        } while(!isDurationCorrect(duration));
         
         // checks what type of task is going to be created
         if(newTask.isRecurring()) {
@@ -127,7 +127,7 @@ public class PSS {
     private void createRecurring(String name, String type, float startTime, float duration) {
         String startDate;
         String endDate;
-        int frequency;
+        String frequency;
 
         // gets user input for start date
         do {
@@ -144,12 +144,27 @@ public class PSS {
         // gets user input for frequency
         do {
             System.out.print("Enter task frequency(1/7): ");
-            frequency = kb.nextInt();
-        } while(frequency != 7 && frequency != 1);
+            frequency = kb.nextLine();
+        } while(!isFrequencyCorrect(frequency));
         
 
-        RecurringTask newTask = new RecurringTask(name, type, startTime, duration, dateConversion(startDate), dateConversion(endDate), frequency);
+        RecurringTask newTask = new RecurringTask(name, type, startTime, duration, dateConversion(startDate), dateConversion(endDate), Integer.parseInt(frequency));
         tasks.add(newTask);
+    }
+
+    private boolean isFrequencyCorrect(String frequency) {
+        int f = 0;
+
+        try {
+            f = Integer.parseInt(frequency);
+        } catch(NumberFormatException e) {
+            return false;
+        }
+
+        if(f != 1 && f != 7)
+            return false;
+
+        return true;
     }
 
     /**
@@ -167,7 +182,7 @@ public class PSS {
 
         try {
             hour = Integer.parseInt(duration.substring(0, duration.indexOf(":"))); // the first two chars
-            minute = Integer.parseInt(duration.substring(duration.indexOf(":") + 1, duration.indexOf(" "))); // the last two chars
+            minute = Integer.parseInt(duration.substring(duration.indexOf(":") + 1)); // the last two chars
         } catch(NumberFormatException e) {
             return false;
         }
@@ -226,11 +241,10 @@ public class PSS {
         if(date.length() < 10 || date.length() > 10) 
             return false;
 
-
         try {
             month = Integer.parseInt(date.substring(0, 2));
             day = Integer.parseInt(date.substring(3, 5));
-            year = Integer.parseInt(date.substring(7, 11));
+            year = Integer.parseInt(date.substring(7));
         } catch(NumberFormatException e) {
             return false;
         }
