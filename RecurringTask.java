@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 public class RecurringTask extends Task {
 
     int startDate;
@@ -13,33 +11,64 @@ public class RecurringTask extends Task {
         this.frequency = frequency;
     }
 
-    public boolean overlaps(float time, float dur, int date) {
-        if(frequency == 1 && (date >= startDate && date <= endDate)) {
-            if(time == startTime)
+    public boolean conflicts(float time, float dur, int date) {
+        if(date < startDate || date > endDate)
+            return false;
+        else if(frequency == 1 && (date >= startDate && date <= endDate)) {
+            return overlaps(time, dur);
+        }
+        else if(overlaps(time, dur)) {
+            int next = startDate;
+            int year = (next - next % 10000) / 10000;
+            int month = ((next - next % 100) - year * 10000) / 100;
+            int day = next - year * 10000 - month * 100;
+
+            while(next < endDate && next < date) {
+                day += 7;
+
+                if((month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) && day > 31) {
+                    if(month == 12) {
+                        year++;
+                        month = 1;
+                        day -= 31;
+                    }
+                    else {
+                        month++;
+                        day -= 31;
+                    }
+                }
+                else if((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) {
+                    month++;
+                    day -= 30;
+                }
+                else if(month == 2 && day > 28) {
+                    if(year % 4 == 0 && year % 100 == 0 && year % 400 == 0 && day > 29) {
+                        month++;
+                        day -= 29;
+                    }
+                    else {
+                        month++;
+                        day -= 28;
+                    }
+                }
+
+                next = year * 10000 + month * 100 + day;
+
+                if(next == date)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean overlaps(float time, float dur) {
+        if(time == startTime)
                 return true;
             else if(time < startTime && time + dur > startTime)
                 return true;
             else if(time > startTime && startTime + duration > time)
                 return true;
-        }
-        else {
-            ArrayList<Integer> dates = new ArrayList<>();
-            int i = 0;
-
-            dates.add(startDate);
-
-            while(true) {
-                int year = (dates.get(i) - dates.get(i) % 10000) / 10000;
-                int month = ((dates.get(i) - dates.get(i) % 100) - year * 10000) / 100;
-                int day = dates.get(i) - year * 10000 - month * 100;
-                int nextWeek = dates.get(i) + 7;
-
-                if(nextWeek > endDate)
-                    return true;
-
-                
-            }
-        }
 
         return false;
     }
