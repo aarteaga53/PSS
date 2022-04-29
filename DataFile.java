@@ -11,7 +11,7 @@ public class DataFile {
      * @param filename
      * @param tasks
      */
-    public void write(String filename, ArrayList<Task> tasks) {
+    public void write(ArrayList<Task> tasks, String filename) {
         try {
             File file = new File(filename);
             FileWriter fw = new FileWriter(file);

@@ -116,4 +116,8 @@ public class Task {
                 "\t\t\"Duration\" : " + duration + ",\n\t}";
     }
 
+    public String toString() {
+        return name + "\n" + type + "\n" + timeConversion() + "\n" + durationConversion();
+    }
+
 }

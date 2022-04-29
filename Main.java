@@ -9,7 +9,7 @@ public class Main {
         User user = new User();
 
         while(true) {
-            System.out.print("a) Login\nb) Signup\nEnter option: ");
+            System.out.print("Welcome to PSS!\n\ta) Login\n\tb) Signup\nEnter option: ");
             char option = kb.nextLine().toLowerCase().charAt(0);
 
             if(option == 'a')

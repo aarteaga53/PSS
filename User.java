@@ -11,7 +11,7 @@ import java.util.Scanner;
 
 public class User {
 
-    Scanner kb = new Scanner(System.in);
+    private Scanner kb = new Scanner(System.in);
     String username;
     String password;
 
