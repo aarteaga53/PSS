@@ -28,21 +28,21 @@ public class User {
             System.out.print("Enter username: ");
             newUsername = kb.nextLine();
 
-            if(newUsername.length() < 1)
+            if(newUsername.length() <= 1)
                 System.out.println("\nUsername is too short.\n");
 
             if(users.containsKey(newUsername))
                 System.out.println("\nUsername already exists.\n");
-        } while(users.containsKey(newUsername) || newUsername.length() < 1);
+        } while(users.containsKey(newUsername) || newUsername.length() <= 1);
 
         // gets password that is longer than 1 character
         do {
             System.out.print("Enter password: ");
             newPassword = kb.nextLine();
 
-            if(newPassword.length() < 1)
+            if(newPassword.length() <= 1)
                 System.out.println("\nPassword is too short.\n");
-        } while(newPassword.length() < 1);
+        } while(newPassword.length() <= 1);
         
 
         addUser(newUsername, newPassword);

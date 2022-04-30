@@ -98,9 +98,9 @@ public class PSS {
 
             newTask = new AntiTask(name, type, timeConversion(startTime), durationConversion(duration), dateConversion(date));
 
-            if(antiConflicts(newTask))
+            if(!antiConflicts(newTask))
                 System.out.println("\nAnti Task does not cancel a recurring task.\n");
-        } while(antiConflicts(newTask));
+        } while(!antiConflicts(newTask));
         
         tasks.add(newTask);
     }
@@ -110,8 +110,16 @@ public class PSS {
             if(t.isRecurring()) {
                 RecurringTask temp = (RecurringTask) t;
 
-                if(temp.startDate != newTask.date) {
-                    if(temp.startTime != newTask.startTime || temp.duration != newTask.duration)
+                for(Task at : tasks) {
+                    if(at.isAnti()) {
+                        AntiTask atemp = (AntiTask) at;
+                        if(atemp.startTime == newTask.startTime && atemp.duration == newTask.duration && atemp.date == newTask.date)
+                            return false;
+                    }
+                }
+
+                if(temp.date == newTask.date) {
+                    if(temp.startTime == newTask.startTime && temp.duration == newTask.duration)
                         return true;
                 }
             }
@@ -212,38 +220,20 @@ public class PSS {
             if(t.isRecurring()) {
                 RecurringTask temp = (RecurringTask) t;
 
-                if(temp.startDate == newTask.startDate || (temp.startDate < newTask.startDate && temp.endDate > newTask.startDate)) {
-                    if(temp.startTime == newTask.startTime)
-                        return true;
-                    else if(newTask.startTime < temp.startTime && newTask.startTime + newTask.duration > temp.startTime)
-                        return true;
-                    else if(newTask.startTime > temp.startTime && temp.startTime + temp.duration > newTask.startTime)
-                        return true;
-                }
+                if(temp.date == newTask.date || (temp.date < newTask.date && temp.endDate > newTask.date))
+                    return newTask.overlaps(temp.startTime, temp.duration);
             }
             else if(t.isTransient()) {
                 TransientTask temp = (TransientTask) t;
 
-                if(temp.date >= newTask.startDate && temp.date <= newTask.endDate) {
-                    if(temp.startTime == newTask.startTime)
-                        return true;
-                    else if(newTask.startTime < temp.startTime && newTask.startTime + newTask.duration > temp.startTime)
-                        return true;
-                    else if(newTask.startTime > temp.startTime && temp.startTime + temp.duration > newTask.startTime)
-                        return true;
-                }
+                if(temp.date >= newTask.date && temp.date <= newTask.endDate) 
+                    return newTask.overlaps(temp.startTime, temp.duration);
             }
             else {
                 AntiTask temp = (AntiTask) t;
 
-                if(temp.date >= newTask.startDate && temp.date <= newTask.endDate) {
-                    if(temp.startTime == newTask.startTime)
-                        return true;
-                    else if(newTask.startTime < temp.startTime && newTask.startTime + newTask.duration > temp.startTime)
-                        return true;
-                    else if(newTask.startTime > temp.startTime && temp.startTime + temp.duration > newTask.startTime)
-                        return true;
-                }
+                if(temp.date >= newTask.date && temp.date <= newTask.endDate)
+                    return newTask.overlaps(temp.startTime, temp.duration);
             }
         }
 

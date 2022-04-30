@@ -2,6 +2,7 @@ public class Task {
 
     String name;
     String type;
+    int date;
     float startTime;
     float duration;
 
@@ -9,9 +10,10 @@ public class Task {
         this.type = type;
     }
 
-    public Task(String name, String type, float startTime, float duration) {
+    public Task(String name, String type, int date, float startTime, float duration) {
         this.name = name;
         this.type = type;
+        this.date = date;
         this.startTime = startTime;
         this.duration = duration;
     }
@@ -103,6 +105,19 @@ public class Task {
             time = (hour - 12) + time + "pm";
 
         return time;
+    }
+
+    public boolean conflicts(Task t) {
+        if(t.date == date) {
+            if(t.startTime == startTime)
+                return true;
+            else if(t.startTime < startTime && t.startTime + t.duration > startTime)
+                return true;
+            else if(t.startTime > startTime && startTime + duration > t.startTime)
+                return true;
+        }
+
+        return false;
     }
 
     /**
