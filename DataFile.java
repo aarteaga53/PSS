@@ -60,13 +60,13 @@ public class DataFile {
 
                 // creates a new task if the necessary variables have been read for a specific task type
                 if(line.equals("\t},") || line.equals("\t}")) {
-                    Task newTask;
+                    Task newTask = new Task(type);
 
-                    if(new Task(type).isRecurring()) {
+                    if(newTask.isRecurring()) {
                         newTask = new RecurringTask(name, type, startTime, duration, date, endDate, frequency);
                         newTasks.add(newTask);
                     }  
-                    else if(new Task(type).isTransient()) {
+                    else if(newTask.isTransient()) {
                         newTask = new TransientTask(name, type, startTime, duration, date);
                         newTasks.add(newTask);
                     }
@@ -79,7 +79,7 @@ public class DataFile {
 
                     // checks that no task has the same name
                     for(i = 0; i < tasks.size(); i++) {
-                        if(tasks.get(i).name.equals(newTask.name))
+                        if(tasks.get(i).name.equals(newTask.name) || tasks.get(i).conflicts(newTask))
                             break;
                     }
 

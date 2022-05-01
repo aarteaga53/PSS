@@ -1,8 +1,16 @@
 public class AntiTask extends Task {
     
-
     public AntiTask(String name, String type, float startTime, float duration, int date) {
         super(name, type, date, startTime, duration);
+    }
+
+    public boolean conflicts(Task t) {
+        if(t.date == date) {
+            if(overlaps(t))
+                return true;
+        }
+
+        return false;
     }
 
     /**

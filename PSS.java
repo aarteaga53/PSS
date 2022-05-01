@@ -26,7 +26,7 @@ public class PSS {
 
         // checks if the name is unique
         if(!uniqueName(name)) {
-            System.out.println("\nTask name is already taken.\n");
+            System.out.println("\nTask name is already taken.");
             return;
         }
         
@@ -51,7 +51,7 @@ public class PSS {
         String prompt = "Choose task type:\n" +
                         "\tClass - Recurring\n\tStudy - Recurring\n\tSleep - Recurring\n\tExercise - Recurring\n\tWork - Recurring\n\tMeal - Recurring\n" +
                         "\tVisit - Transient\n\tShopping - Transient\n\tAppointment - Transient\n" +
-                        "\tCancellation - Anti\nEnter option: ";
+                        "\tCancellation - Anti\nEnter type: ";
 
         // Gets user input for task type
         do {
@@ -77,55 +77,30 @@ public class PSS {
         String duration;
         String date;
 
+        // gets user input for start time
         do {
-            // gets user input for start time
-            do {
-                System.out.print("Enter task start time(hh:mm am/pm): ");
-                startTime = kb.nextLine();
-            } while(!isStartTimeCorrect(startTime));
+            System.out.print("Enter task start time(hh:mm am/pm): ");
+            startTime = kb.nextLine();
+        } while(!isStartTimeCorrect(startTime));
 
-            // gets user input for duration
-            do {
-                System.out.print("Enter task duration(hh:mm): ");
-                duration = kb.nextLine();
-            } while(!isDurationCorrect(duration));
+        // gets user input for duration
+        do {
+            System.out.print("Enter task duration(hh:mm): ");
+            duration = kb.nextLine();
+        } while(!isDurationCorrect(duration));
 
-            // gets user input for date
-            do {
-                System.out.print("Enter task date(mm/dd/yyyy): ");
-                date = kb.nextLine();
-            } while(!isDateCorrect(date));
+        // gets user input for date
+        do {
+            System.out.print("Enter task date(mm/dd/yyyy): ");
+            date = kb.nextLine();
+        } while(!isDateCorrect(date));
 
-            newTask = new AntiTask(name, type, timeConversion(startTime), durationConversion(duration), dateConversion(date));
+        newTask = new AntiTask(name, type, timeConversion(startTime), durationConversion(duration), dateConversion(date));
 
-            if(!antiConflicts(newTask))
-                System.out.println("\nAnti Task does not cancel a recurring task.\n");
-        } while(!antiConflicts(newTask));
-        
-        tasks.add(newTask);
-    }
-
-    private boolean antiConflicts(AntiTask newTask) {
-        for(Task t : tasks) {
-            if(t.isRecurring()) {
-                RecurringTask temp = (RecurringTask) t;
-
-                for(Task at : tasks) {
-                    if(at.isAnti()) {
-                        AntiTask atemp = (AntiTask) at;
-                        if(atemp.startTime == newTask.startTime && atemp.duration == newTask.duration && atemp.date == newTask.date)
-                            return false;
-                    }
-                }
-
-                if(temp.date == newTask.date) {
-                    if(temp.startTime == newTask.startTime && temp.duration == newTask.duration)
-                        return true;
-                }
-            }
-        }
-
-        return false;
+        if(!conflicts(newTask))
+            System.out.println("\nAnti Task does not cancel a recurring task.");
+        else
+            tasks.add(newTask);
     }
 
     /**
@@ -158,7 +133,11 @@ public class PSS {
         } while(!isDateCorrect(date));
 
         newTask = new TransientTask(name, type, timeConversion(startTime), durationConversion(duration), dateConversion(date));
-        tasks.add(newTask);
+
+        if(conflicts(newTask))
+            System.out.println("\nThis task conflicts with an existing task.");
+        else
+            tasks.add(newTask);
     }
 
     /**
@@ -174,69 +153,71 @@ public class PSS {
         String endDate;
         String frequency;
 
+        // gets user input for start time
         do {
-            // gets user input for start time
-            do {
-                System.out.print("Enter task start time(hh:mm am/pm): ");
-                startTime = kb.nextLine();
-            } while(!isStartTimeCorrect(startTime));
+            System.out.print("Enter task start time(hh:mm am/pm): ");
+            startTime = kb.nextLine();
+        } while(!isStartTimeCorrect(startTime));
 
-            // gets user input for duration
-            do {
-                System.out.print("Enter task duration(hh:mm): ");
-                duration = kb.nextLine();
-            } while(!isDurationCorrect(duration));
+        // gets user input for duration
+        do {
+            System.out.print("Enter task duration(hh:mm): ");
+            duration = kb.nextLine();
+        } while(!isDurationCorrect(duration));
 
-            // gets user input for start date
-            do {
-                System.out.print("Enter task start date(mm/dd/yyyy): ");
-                startDate = kb.nextLine();
-            } while(!isDateCorrect(startDate));
+        // gets user input for start date
+        do {
+            System.out.print("Enter task start date(mm/dd/yyyy): ");
+            startDate = kb.nextLine();
+        } while(!isDateCorrect(startDate));
             
-            // gets user input for end date
-            do {
-                System.out.print("Enter task end date(mm/dd/yyyy): ");
-                endDate = kb.nextLine();
-            } while(!isEndDateCorrect(startDate, endDate));
+        // gets user input for end date
+        do {
+            System.out.print("Enter task end date(mm/dd/yyyy): ");
+            endDate = kb.nextLine();
+        } while(!isEndDateCorrect(startDate, endDate));
 
-            // gets user input for frequency
-            do {
-                System.out.print("Enter task frequency(1/7): ");
-                frequency = kb.nextLine();
-            } while(!isFrequencyCorrect(frequency));
+        // gets user input for frequency
+        do {
+            System.out.print("Enter task frequency(1/7): ");
+            frequency = kb.nextLine();
+        } while(!isFrequencyCorrect(frequency));
 
-            newTask = new RecurringTask(name, type, timeConversion(startTime), durationConversion(duration), dateConversion(startDate), dateConversion(endDate), Integer.parseInt(frequency));
+        newTask = new RecurringTask(name, type, timeConversion(startTime), durationConversion(duration), dateConversion(startDate), dateConversion(endDate), Integer.parseInt(frequency));
 
-            if(recurringConflicts(newTask))
-                System.out.println("\nThis task conflicts with an existing task.\n");
-        } while(recurringConflicts(newTask));
-        
-
-        tasks.add(newTask);
+        if(conflicts(newTask))
+            System.out.println("\nThis task conflicts with an existing task.");
+        else
+            tasks.add(newTask);
     }
 
-    private boolean recurringConflicts(RecurringTask newTask) {
-        for(Task t : tasks) {
-            if(t.isRecurring()) {
-                RecurringTask temp = (RecurringTask) t;
-
-                if(temp.date == newTask.date || (temp.date < newTask.date && temp.endDate > newTask.date))
-                    return newTask.overlaps(temp.startTime, temp.duration);
-            }
-            else if(t.isTransient()) {
-                TransientTask temp = (TransientTask) t;
-
-                if(temp.date >= newTask.date && temp.date <= newTask.endDate) 
-                    return newTask.overlaps(temp.startTime, temp.duration);
-            }
-            else {
-                AntiTask temp = (AntiTask) t;
-
-                if(temp.date >= newTask.date && temp.date <= newTask.endDate)
-                    return newTask.overlaps(temp.startTime, temp.duration);
+    private boolean conflicts(Task newTask) {
+        if(newTask.isTransient()) {
+            for(Task t : tasks) {
+                if(t.isRecurring() && t.conflicts(newTask)) {
+                    for(Task a : tasks) {
+                        if((a.isAnti() && t.conflicts(a)) && a.conflicts(newTask))
+                            return false;
+                    }
+                }
             }
         }
-
+        else {
+            for(Task t : tasks)
+                if(t.conflicts(newTask))
+                    return true;
+        }
+        // for(Task t : tasks) {
+        //     if(t.conflicts(newTask) && (t.isRecurring() && newTask.isTransient())) {
+        //         for(Task a : tasks) {
+        //             if((a.isAnti() && (a.startTime == t.startTime && a.duration == t.duration)) && !a.conflicts(newTask))
+        //                 return false;
+        //         }
+        //     }
+        //     else if(t.conflicts(newTask))
+        //         return true;
+        // }
+            
         return false; 
     }
 
@@ -457,12 +438,12 @@ public class PSS {
     public void viewTask(String name) {
         for(Task t : tasks) {
             if(t.name.equals(name)) {
-                System.out.println("\n" + t.toString() + "\n");
+                System.out.println("\n" + t.toString());
                 return;
             }
         }
 
-        System.out.println("\nTask not found.\n");
+        System.out.println("\nTask not found.");
     }
 
     /**
@@ -473,11 +454,11 @@ public class PSS {
         for(Task t : tasks)
             if(t.name.equals(name)) {
                 tasks.remove(t);
-                System.out.println("\nTask deleted.\n");
+                System.out.println("\nTask deleted.");
                 return;
             }
 
-        System.out.println("\nTask not found.\n");
+        System.out.println("\nTask not found.");
     }
 
     /**
@@ -491,7 +472,7 @@ public class PSS {
                 return;
             }
 
-        System.out.println("\nTask not found.\n");
+        System.out.println("\nTask not found.");
     }
 
     /**
@@ -508,7 +489,7 @@ public class PSS {
             filename = kb.nextLine();
 
             if(!filename.contains(".json"))
-                System.out.println("\nMust be JSON file.\n");
+                System.out.println("\nMust be JSON file.");
         } while(!filename.contains(".json"));
         
         // checks if the file exists
@@ -538,7 +519,7 @@ public class PSS {
             filename = kb.nextLine();
 
             if(!filename.contains(".json"))
-                System.out.println("\nMust be JSON file.\n");
+                System.out.println("\nMust be JSON file.");
         } while(!filename.contains(".json"));
         
         // checks if the file exists

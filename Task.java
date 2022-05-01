@@ -109,13 +109,19 @@ public class Task {
 
     public boolean conflicts(Task t) {
         if(t.date == date) {
-            if(t.startTime == startTime)
-                return true;
-            else if(t.startTime < startTime && t.startTime + t.duration > startTime)
-                return true;
-            else if(t.startTime > startTime && startTime + duration > t.startTime)
-                return true;
+            return overlaps(t);
         }
+
+        return false;
+    }
+
+    public boolean overlaps(Task t) {
+        if(t.startTime == startTime)
+            return true;
+        else if(t.startTime < startTime && t.startTime + t.duration > startTime)
+            return true;
+        else if(t.startTime > startTime && startTime + duration > t.startTime)
+            return true;
 
         return false;
     }
