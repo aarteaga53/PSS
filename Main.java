@@ -73,7 +73,7 @@ public class Main {
             "\ta) Create a task\n\tb) View a task\n" +
             "\tc) Delete a task\n\td) Edit a task\n" +
             "\te) Write schedule to a file\n\tf) Read schedule from a file\n" +
-            "\tg) View schedule for a day\n\th) View schedule for a weekk\n" +
+            "\tg) View schedule for a day\n\th) View schedule for a week\n" +
             "\ti) View schedule for a month\n\tj) Exit\nEnter option: ";
 
         do {

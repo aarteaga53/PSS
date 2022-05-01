@@ -1,14 +1,40 @@
+import java.util.ArrayList;
+
 public class RecurringTask extends Task {
 
     int endDate;
     int frequency;
+    ArrayList<AntiTask> links;
 
     public RecurringTask(String name, String type, float startTime, float duration, int startDate, int endDate, int frequency) {
         super(name, type, startDate, startTime, duration);
         this.endDate = endDate;
         this.frequency = frequency;
+        links = new ArrayList<>();
     }
 
+    public void addLink(AntiTask link) {
+        links.add(link);
+    }
+
+    public void removeLink(AntiTask link) {
+        links.remove(link);
+    }
+
+    public boolean hasLink(Task link) {
+        for(AntiTask a : links) {
+            if((!a.conflicts(link) && a.date == link.date) && link.isTransient())
+                return true;
+            else if(a.conflicts(link) && !link.isTransient())
+                return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if a given task conflicts with this task
+     */
     public boolean conflicts(Task t) {
         if(overlaps(t)) {
             int next = date;
@@ -16,7 +42,13 @@ public class RecurringTask extends Task {
             if(!t.isRecurring()) {
                 while(next <= endDate && next <= t.date) {
                     if(next == t.date) {
-                        if((t.isAnti() && (t.startTime == startTime && t.duration == duration)) || !t.isAnti())
+                        if((t.isAnti() && (t.startTime == startTime && t.duration == duration)) && !hasLink(t)) {
+                            addLink((AntiTask) t);
+                            return false;
+                        }
+                        else if(t.isTransient() && hasLink(t))
+                            return false;   
+                        else
                             return true;
                     }
     
@@ -24,19 +56,38 @@ public class RecurringTask extends Task {
                 }
             }
             else {
-                RecurringTask rt = (RecurringTask) t;
-                next = rt.date < date ? rt.date : date;
-                int ed = rt.date < date ? rt.endDate : endDate;
-                int sd = rt.date < date ? date : rt.date;
-                int freq = rt.date < date ? rt.frequency : frequency;
+                ArrayList<Integer> dates = new ArrayList<>();
+                ArrayList<Integer> otherDates = new ArrayList<>();
+                RecurringTask r = (RecurringTask) t;
 
-                while(next <= ed && next <= sd) {
-                    if(next == sd)
-                        return true;
-
-                    next = nextDate(next, freq);
+                while(next <= endDate) {
+                    dates.add(next);
+                    next = nextDate(next, frequency);
                 }
-                
+
+                next = r.date;
+
+                while(next <= r.endDate) {
+                    otherDates.add(next);
+                    next = nextDate(next, r.frequency);
+                }
+
+                for(int d : dates) {
+                    if(otherDates.contains(d))
+                        return true;
+                }
+                // RecurringTask rt = (RecurringTask) t;
+                // next = rt.date < date ? rt.date : date;
+                // int ed = rt.date < date ? rt.endDate : endDate;
+                // int sd = rt.date < date ? date : rt.date;
+                // int freq = rt.date < date ? rt.frequency : frequency;
+
+                // while(next <= ed && next <= sd) {
+                //     if(next == sd)
+                //         return true;
+
+                //     next = nextDate(next, freq);
+                // } 
             }
             
         }
@@ -44,7 +95,13 @@ public class RecurringTask extends Task {
         return false;
     }
 
-    private int nextDate(int next, int freq) {
+    /**
+     * Increments the date by the frequency, 1 or 7 days
+     * @param next
+     * @param freq
+     * @return
+     */
+    public int nextDate(int next, int freq) {
         int year = (next - next % 10000) / 10000;
         int month = ((next - next % 100) - year * 10000) / 100;
         int day = next - year * 10000 - month * 100;

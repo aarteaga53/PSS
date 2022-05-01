@@ -1,12 +1,40 @@
+import java.util.ArrayList;
+
 public class AntiTask extends Task {
+
+    ArrayList<TransientTask> links;
     
     public AntiTask(String name, String type, float startTime, float duration, int date) {
         super(name, type, date, startTime, duration);
+        links = new ArrayList<>();
+    }
+
+    public void addLink(TransientTask link) {
+        links.add(link);
+    }
+
+    public void removeLink(TransientTask link) {
+        links.remove(link);
+    }
+
+    public boolean hasLink(Task link) {        
+        for(TransientTask t : links) {
+            if(t == link)
+                return false;
+            else if(t.conflicts(link))
+                return true;
+        }
+
+        return false;
     }
 
     public boolean conflicts(Task t) {
-        if(t.date == date) {
-            if(overlaps(t))
+        if(t.date == date && overlaps(t)) {
+            if(t.isTransient() && !hasLink(t)) {
+                addLink((TransientTask) t);
+                return false;
+            }
+            else
                 return true;
         }
 

@@ -19,4 +19,32 @@ public class TransientTask extends Task {
         return name + "\n" + type + "\n" + timeConversion() + "\n" + durationConversion() + "\n" + dateConversion(date);
     }
 
+    /**
+     * Checks if this TransientTask class is less than, equal to, or greater than a specified
+     * other Task. The otehr Task should only be another TransientTask.
+     * @param taskOther     The task to be compared to this Task.
+     * @return      an integer representing whether this class is less than, equal to,
+     *              or greater than the specified task.
+     */
+    public int compareTo(Task taskOther) {
+        TransientTask other = (TransientTask) taskOther;
+        if (date < other.date) {
+            return -1;
+        }
+        else if (date > other.date) {
+            return 1;
+        }
+        else {
+            if (startTime < other.startTime) {
+                return -1;
+            }
+            else if (startTime > other.startTime) {
+                return 1;
+            }
+            else {
+                return 0;
+            }
+        }
+    }
+
 }

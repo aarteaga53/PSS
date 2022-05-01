@@ -29,7 +29,7 @@ public class DataFile {
             fw.write(text + "\n]");
             fw.close();
         } catch(IOException e) {
-            System.out.println("\nError writing to file.\n");
+            System.out.println("\nError writing to file.");
         }
     }
 
@@ -77,7 +77,7 @@ public class DataFile {
 
                     int i;
 
-                    // checks that no task has the same name
+                    // checks that there is no conflicts with tasks
                     for(i = 0; i < tasks.size(); i++) {
                         if(tasks.get(i).name.equals(newTask.name) || tasks.get(i).conflicts(newTask))
                             break;
@@ -95,7 +95,7 @@ public class DataFile {
                         name = split[1].substring(split[1].indexOf("\"") + 1, split[1].lastIndexOf("\""));
                     else if(split[0].equals("\t\t\"Type\""))
                         type = split[1].substring(split[1].indexOf("\"") + 1, split[1].lastIndexOf("\""));
-                    else if(split[0].equals("\t\t\"StartDate\"") || line.split(":")[0].equals("\t\t\"Date\""))
+                    else if(split[0].equals("\t\t\"StartDate\"") || split[0].equals("\t\t\"Date\""))
                         date = Integer.parseInt(split[1].substring(0, split[1].indexOf(",")));
                     else if(split[0].equals("\t\t\"StartTime\""))
                         startTime = Float.parseFloat(split[1].substring(0, split[1].indexOf(",")));
@@ -114,7 +114,7 @@ public class DataFile {
 
             infile.close();
         } catch(IOException e) {
-            System.out.println("\nError reading from file.\n");
+            System.out.println("\nError reading from file.");
         }
     }
 
