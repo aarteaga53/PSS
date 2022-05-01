@@ -1,3 +1,5 @@
+import java.util.Calendar;
+
 public class RecurringTask extends Task {
 
     int startDate;
@@ -90,4 +92,39 @@ public class RecurringTask extends Task {
         return name + "\n" + type + "\n" + timeConversion() + "\n" + durationConversion() + "\n" + dateConversion(startDate) + "\n" + dateConversion(endDate) + "\n" + ((frequency == 1) ? "Daily" : "Weekly");
     }
 
+    /**
+     * Checks if this RecurringTask occurs on the given date
+     * @param date
+     */
+    public boolean doesOccurOn(int date) {
+        boolean isWithinRange = startDate <= date && date <= endDate;
+        boolean isSameDayOfWeek = false;
+        boolean doesOccurOn;
+        if (frequency == 7) {
+            isSameDayOfWeek = (getDayOfWeek(startDate) == getDayOfWeek(date));
+            doesOccurOn = isWithinRange && isSameDayOfWeek;
+        }
+        else if (frequency == 1) {
+            doesOccurOn = isWithinRange;
+        }
+        else {
+            doesOccurOn = false;
+        }
+        return doesOccurOn;
+    }
+
+    /**
+     * Returns what day of the week a date occurs on.
+     * @param date
+     * @return  An integer representing the day of the week (Sunday, Monday, Tuesday...).
+     */
+    public int getDayOfWeek(int date) {
+        int day = date % 100;
+        int month = (date % 10000) / 100;
+        int year = date / 10000;
+        Calendar cal = Calendar.getInstance();
+        cal.set(year, month, day);
+        int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+        return dayOfWeek;
+    }
 }

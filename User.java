@@ -124,7 +124,13 @@ public class User {
     
                 for(String user : lines) {
                     String[] split = user.split(":");
-                    users.put(split[0], split[1]);
+                    if (split.length == 2) {
+                        users.put(split[0], split[1]);
+                    }
+                    else {
+                        System.out.println("Error: Read an entry in the users.txt"
+                                            + " that was in an invalid format");
+                    }
                 }
             } catch(IOException e) {
                 System.out.println("\nError.\n");

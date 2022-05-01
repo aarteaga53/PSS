@@ -1,4 +1,4 @@
-public class Task {
+public class Task implements Comparable<Task>{
 
     String name;
     String type;
@@ -120,4 +120,37 @@ public class Task {
         return name + "\n" + type + "\n" + timeConversion() + "\n" + durationConversion();
     }
 
+    /**
+     * Checks if this Task occurs on a given date. This method is not meant to be
+     * called. It is here for error detection, in case one thought they were calling the
+     * corresponding method of a subclass.
+     * @param date
+     * @return  True if this task does occur on the specified date, false otherwise.
+     */
+    public boolean doesOccurOn(int date) {
+        System.out.println("occursOn() is not meant to be supported by the Task class");
+        return false;
+    }
+
+    /**
+     * Checks if this Task class is less than, equal to, or greater than a specified
+     * other Task. This method is not meant to be called by this Task class, but it is
+     * implemented here for error detection, in case one thought they were calling the
+     * corresponding method of the TransientTask subclass.
+     * @param taskOther     The task to be compared to this Task.
+     * @return      an integer representing whether this class is less than, equal to,
+     *              or greater than the specified task.
+     */
+    public int compareTo(Task taskOther) {
+        System.out.println("compareTo() is not meant to be supported by the Task class");
+        if (startTime < taskOther.startTime) {
+            return -1;
+        }
+        else if (startTime == taskOther.startTime) {
+            return 0;
+        }
+        else {
+            return 1;
+        }
+    }
 }

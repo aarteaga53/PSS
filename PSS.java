@@ -1,5 +1,7 @@
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Scanner;
 
 public class PSS {
@@ -105,8 +107,11 @@ public class PSS {
         tasks.add(newTask);
     }
 
-    private boolean antiConflicts(AntiTask newTask) {
-        for(Task t : tasks) {
+    // I think this method may return true if there is atleast one recurring task it does NOT
+    // cancel out. It may have to be modified to return true if there is atleast one recurring
+    // task it cancels out.
+    private boolean antiConflicts(AntiTask newTask) { 
+        for(Task t : tasks) {               
             if(t.isRecurring()) {
                 RecurringTask temp = (RecurringTask) t;
 
@@ -117,6 +122,22 @@ public class PSS {
             }
         }
 
+        return false;
+    }
+
+    /**
+     * Checks if a specified antitask and transient task (which should represent one instance of
+     * a recurring task) cancel each other out.
+     * @param aTask     An antitask.
+     * @param tTask     One instance of a recurring task that may or may not be canceled by the
+     *                  anti task.
+     * @return      True if the instance of the antitask and the recurring task cancel each other out.
+     */
+    private boolean antiConflicts(AntiTask aTask, TransientTask tTask) {
+        if(tTask.date == aTask.date) {
+            if(tTask.startTime == aTask.startTime || tTask.duration == aTask.duration)
+                return true;
+        }
         return false;
     }
 
@@ -560,16 +581,184 @@ public class PSS {
         }
     }
 
+    /**
+     * Asks the user to enter a date and returns the schedule for that date, sorted by time.
+     */
     public void daySchedule() {
+        String startDate;
+        // gets user input for start date
+        do {
+            System.out.print("Enter a date to see its tasks (mm/dd/yyyy): ");
+            startDate = kb.nextLine();
+        } while(!isDateCorrect(startDate));
 
+        int date = dateConversion(startDate);
+
+        List<Task> tasksInPeriod = getTasksInPeriod(date, 1);
+
+        Collections.sort(tasksInPeriod);
+
+        for (Task task: tasksInPeriod){
+            System.out.println("\n" + task.toString() + "\n");
+        }
     }
 
+    /**Asks the user to enter a date and returns the schedule from that date up to and
+     * excluding 7 days later.
+     */
     public void weekSchedule() {
+        String startDate;
+        // gets user input for start date
+        do {
+            System.out.print("Enter a date to see the tasks from the date to a week later (mm/dd/yyyy): ");
+            startDate = kb.nextLine();
+        } while(!isDateCorrect(startDate));
 
+        int date = dateConversion(startDate);
+
+        List<Task> tasksInPeriod = getTasksInPeriod(date, 7);
+
+        Collections.sort(tasksInPeriod);
+
+        for (Task task: tasksInPeriod){
+            System.out.println("\n" + task.toString() + "\n");
+        }
     }
 
+    /**
+     * Asks the user for a date and returns the schedule from that date up to
+     * and excluding 30 days later.
+     */
     public void monthSchedule() {
+        String startDate;
+        // gets user input for start date
+        do {
+            System.out.print("Enter a date to see the tasks from the date to a month later (mm/dd/yyyy): ");
+            startDate = kb.nextLine();
+        } while(!isDateCorrect(startDate));
 
+        int date = dateConversion(startDate);
+
+        List<Task> tasksInPeriod = getTasksInPeriod(date, 30);
+
+        Collections.sort(tasksInPeriod);
+
+        for (Task task: tasksInPeriod){
+            System.out.println("\n" + task.toString() + "\n");
+        }
     }
+
+    /**
+     * Returns a list of tasks occuring within a given period without
+     * canceled recurring tasks.
+     * @param startDate
+     * @param durationInDays
+     * @return
+     */
+    private List<Task> getTasksInPeriod(int startDate, int durationInDays) {
+        List<Task> tasksInPeriod = new ArrayList<Task>();
+        int date = startDate;
+        int count = 0;
+        while (count < durationInDays) {
+            for (Task task: getTasksInDay(date)) {
+                tasksInPeriod.add(task);
+            }
+            date = incrementDate(date);
+            count += 1;
+        }
+        return tasksInPeriod;
+    }
+
+    /**
+     * Calculates the date of the day after the given date, accounting for leap year.
+     * @param date
+     * @return  The date of the day after the given date.
+     */
+    private int incrementDate(int date) {
+        int next = date;
+        int year = (next - next % 10000) / 10000;
+        int month = ((next - next % 100) - year * 10000) / 100;
+        int day = next - year * 10000 - month * 100;
+
+        day += 1;
+
+        if((month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) && day > 31) {
+            if(month == 12) {
+                year++;
+                month = 1;
+                day -= 31;
+            }
+            else {
+                month++;
+                day -= 31;
+            }
+        }
+        else if((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) {
+            month++;
+            day -= 30;
+        }
+        else if(month == 2 && day > 28) {
+            if(year % 4 == 0 && year % 100 == 0 && year % 400 == 0 && day > 29) {
+                month++;
+                day -= 29;
+            }
+            else {
+                month++;
+                day -= 28;
+            }
+        }
+
+        next = year * 10000 + month * 100 + day;
+
+        return next;
+    }
+
+    /**
+     * Returns a list of tasks for a given date without canceled recurring tasks.
+     * @param date
+     * @return 
+     */
+    private List<Task> getTasksInDay(int date) {
+        List<Task> tasksInDay = new ArrayList<Task>();
+        List<Task> antiTasksInDay = new ArrayList<Task>();
+        for (Task task: tasks) {
+            if (task.doesOccurOn(date)) {
+                if (task.isRecurring()) {
+                    TransientTask tTask = recurringToTransient((RecurringTask)task, date);
+                    tasksInDay.add(tTask);
+                }
+                else if (task.isAnti()) {
+                    antiTasksInDay.add(task);
+                }
+                else if (task.isTransient()) {
+                    tasksInDay.add(task);
+                }
+                else {
+                    System.out.println("getTasksInDay found an invalid task");
+                }
+            }
+        }
+        // removes occurances of recurring tasks that are canceled by an antitask
+        for (Task antiTask: antiTasksInDay) {
+            for (Task task: tasksInDay) { 
+                if (task.isRecurring()) {  // actually a transient occurance of a recurring task
+                    if (antiConflicts((AntiTask)antiTask, (TransientTask)task)) {
+                        tasksInDay.remove(task);
+                    }
+                }
+            }
+        }
+        return tasksInDay;
+    }
+
+    /**
+     * Creates a transient task on a given date representing one occurance of a 
+     * recurring task. Does not check if the recurring task actually occurs on the
+     * given date or not.
+     */
+    private TransientTask recurringToTransient(RecurringTask rTask, int date) {
+        return new TransientTask(rTask.name, rTask.type, rTask.startTime, rTask.duration, date);
+    }
+
 
 }
