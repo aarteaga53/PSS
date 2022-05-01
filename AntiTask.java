@@ -1,10 +1,44 @@
-public class AntiTask extends Task {
-    
-    int date;
+import java.util.ArrayList;
 
+public class AntiTask extends Task {
+
+    ArrayList<TransientTask> links;
+    
     public AntiTask(String name, String type, float startTime, float duration, int date) {
-        super(name, type, startTime, duration);
-        this.date = date;
+        super(name, type, date, startTime, duration);
+        links = new ArrayList<>();
+    }
+
+    public void addLink(TransientTask link) {
+        links.add(link);
+    }
+
+    public void removeLink(TransientTask link) {
+        links.remove(link);
+    }
+
+    public boolean hasLink(Task link) {        
+        for(TransientTask t : links) {
+            if(t == link)
+                return false;
+            else if(t.conflicts(link))
+                return true;
+        }
+
+        return false;
+    }
+
+    public boolean conflicts(Task t) {
+        if(t.date == date && overlaps(t)) {
+            if(t.isTransient() && !hasLink(t)) {
+                addLink((TransientTask) t);
+                return false;
+            }
+            else
+                return true;
+        }
+
+        return false;
     }
 
     /**
@@ -22,13 +56,4 @@ public class AntiTask extends Task {
         return name + "\n" + type + "\n" + timeConversion() + "\n" + durationConversion() + "\n" + dateConversion(date);
     }
 
-    /**
-     * Checks if this task occurs on the specified date. It is not meant to be called
-     * in this class. It is only implemented here to give a descriptive error message.
-     * @param date
-     */
-    public boolean doesOccurOn(int date) {
-        System.out.println("occursOn() is not meant to be supported by the AntiTask class");
-        return false;
-    }
 }

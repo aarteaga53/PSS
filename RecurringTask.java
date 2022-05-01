@@ -1,78 +1,136 @@
-import java.util.Calendar;
+import java.util.ArrayList;
 
 public class RecurringTask extends Task {
 
-    int startDate;
     int endDate;
     int frequency;
+    ArrayList<AntiTask> links;
 
     public RecurringTask(String name, String type, float startTime, float duration, int startDate, int endDate, int frequency) {
-        super(name, type, startTime, duration);
-        this.startDate = startDate;
+        super(name, type, startDate, startTime, duration);
         this.endDate = endDate;
         this.frequency = frequency;
+        links = new ArrayList<>();
     }
 
-    public boolean conflicts(float time, float dur, int date) {
-        if(date < startDate || date > endDate)
-            return false;
-        else if(frequency == 1 && (date >= startDate && date <= endDate)) {
-            return overlaps(time, dur);
+    public void addLink(AntiTask link) {
+        links.add(link);
+    }
+
+    public void removeLink(AntiTask link) {
+        links.remove(link);
+    }
+
+    public boolean hasLink(Task link) {
+        for(AntiTask a : links) {
+            if((!a.conflicts(link) && a.date == link.date) && link.isTransient())
+                return true;
+            else if(a.conflicts(link) && !link.isTransient())
+                return true;
         }
-        else if(overlaps(time, dur)) {
-            int next = startDate;
-            int year = (next - next % 10000) / 10000;
-            int month = ((next - next % 100) - year * 10000) / 100;
-            int day = next - year * 10000 - month * 100;
 
-            while(next < endDate && next < date) {
-                day += 7;
+        return false;
+    }
 
-                if((month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) && day > 31) {
-                    if(month == 12) {
-                        year++;
-                        month = 1;
-                        day -= 31;
+    /**
+     * Checks if a given task conflicts with this task
+     */
+    public boolean conflicts(Task t) {
+        if(overlaps(t)) {
+            int next = date;
+
+            if(!t.isRecurring()) {
+                while(next <= endDate && next <= t.date) {
+                    if(next == t.date) {
+                        if((t.isAnti() && (t.startTime == startTime && t.duration == duration)) && !hasLink(t)) {
+                            addLink((AntiTask) t);
+                            return false;
+                        }
+                        else if(t.isTransient() && hasLink(t))
+                            return false;   
+                        else
+                            return true;
                     }
-                    else {
-                        month++;
-                        day -= 31;
-                    }
+    
+                    next = nextDate(next, frequency);
                 }
-                else if((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) {
-                    month++;
-                    day -= 30;
-                }
-                else if(month == 2 && day > 28) {
-                    if(year % 4 == 0 && year % 100 == 0 && year % 400 == 0 && day > 29) {
-                        month++;
-                        day -= 29;
-                    }
-                    else {
-                        month++;
-                        day -= 28;
-                    }
-                }
-
-                next = year * 10000 + month * 100 + day;
-
-                if(next == date)
-                    return true;
             }
+            else {
+                ArrayList<Integer> dates = new ArrayList<>();
+                ArrayList<Integer> otherDates = new ArrayList<>();
+                RecurringTask r = (RecurringTask) t;
+
+                while(next <= endDate) {
+                    dates.add(next);
+                    next = nextDate(next, frequency);
+                }
+
+                next = r.date;
+
+                while(next <= r.endDate) {
+                    otherDates.add(next);
+                    next = nextDate(next, r.frequency);
+                }
+
+                for(int d : dates) {
+                    if(otherDates.contains(d))
+                        return true;
+                }
+                // RecurringTask rt = (RecurringTask) t;
+                // next = rt.date < date ? rt.date : date;
+                // int ed = rt.date < date ? rt.endDate : endDate;
+                // int sd = rt.date < date ? date : rt.date;
+                // int freq = rt.date < date ? rt.frequency : frequency;
+
+                // while(next <= ed && next <= sd) {
+                //     if(next == sd)
+                //         return true;
+
+                //     next = nextDate(next, freq);
+                // } 
+            }
+            
         }
 
         return false;
     }
 
-    private boolean overlaps(float time, float dur) {
-        if(time == startTime)
-                return true;
-            else if(time < startTime && time + dur > startTime)
-                return true;
-            else if(time > startTime && startTime + duration > time)
-                return true;
+    /**
+     * Increments the date by the frequency, 1 or 7 days
+     * @param next
+     * @param freq
+     * @return
+     */
+    public int nextDate(int next, int freq) {
+        int year = (next - next % 10000) / 10000;
+        int month = ((next - next % 100) - year * 10000) / 100;
+        int day = next - year * 10000 - month * 100;
 
-        return false;
+        day += freq;
+
+        if((month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) && day > 31) {
+            if(month == 12) {
+                year++;
+                month = 1;
+            }
+            else
+                month++;
+
+            day -= 31;
+        }
+        else if((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) {
+            month++;
+            day -= 30;
+        }
+        else if(month == 2 && day > 28) {
+            if(year % 4 == 0 && year % 100 == 0 && year % 400 == 0 && day > 29)
+                day--;
+        
+            month++;
+            day -= 28;
+        }
+
+        return year * 10000 + month * 100 + day;
     }
 
     /**
@@ -81,7 +139,7 @@ public class RecurringTask extends Task {
     public String convertJSON() {
         return "\t{\n\t\t\"Name\" : \"" + name + "\",\n" +
                 "\t\t\"Type\" : \"" + type + "\",\n" +
-                "\t\t\"StartDate\" : " + startDate + ",\n" +
+                "\t\t\"StartDate\" : " + date + ",\n" +
                 "\t\t\"StartTime\" : " + startTime + ",\n" +
                 "\t\t\"Duration\" : " + duration + ",\n" +
                 "\t\t\"EndDate\" : " + endDate + ",\n" +
@@ -89,42 +147,7 @@ public class RecurringTask extends Task {
     }
 
     public String toString() {
-        return name + "\n" + type + "\n" + timeConversion() + "\n" + durationConversion() + "\n" + dateConversion(startDate) + "\n" + dateConversion(endDate) + "\n" + ((frequency == 1) ? "Daily" : "Weekly");
+        return name + "\n" + type + "\n" + timeConversion() + "\n" + durationConversion() + "\n" + dateConversion(date) + "\n" + dateConversion(endDate) + "\n" + ((frequency == 1) ? "Daily" : "Weekly");
     }
 
-    /**
-     * Checks if this RecurringTask occurs on the given date
-     * @param date
-     */
-    public boolean doesOccurOn(int date) {
-        boolean isWithinRange = startDate <= date && date <= endDate;
-        boolean isSameDayOfWeek = false;
-        boolean doesOccurOn;
-        if (frequency == 7) {
-            isSameDayOfWeek = (getDayOfWeek(startDate) == getDayOfWeek(date));
-            doesOccurOn = isWithinRange && isSameDayOfWeek;
-        }
-        else if (frequency == 1) {
-            doesOccurOn = isWithinRange;
-        }
-        else {
-            doesOccurOn = false;
-        }
-        return doesOccurOn;
-    }
-
-    /**
-     * Returns what day of the week a date occurs on.
-     * @param date
-     * @return  An integer representing the day of the week (Sunday, Monday, Tuesday...).
-     */
-    public int getDayOfWeek(int date) {
-        int day = date % 100;
-        int month = (date % 10000) / 100;
-        int year = date / 10000;
-        Calendar cal = Calendar.getInstance();
-        cal.set(year, month, day);
-        int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-        return dayOfWeek;
-    }
 }

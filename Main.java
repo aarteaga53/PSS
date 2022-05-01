@@ -7,26 +7,27 @@ public class Main {
     public static void main(String[] args) {
         boolean run = true;
         User user = new User();
+        PSS pss = new PSS();
+        char option;
 
-        while(true) {
-            System.out.print("Welcome to PSS!\n\ta) Login\n\tb) Signup\nEnter option: ");
-            char option = kb.nextLine().toLowerCase().charAt(0);
+        while(user.username == null) {
+            option = getStartOption();
 
-            if(option == 'a')
-                user.login();
-
-            if(option == 'b')
-                user.signup();
-
-            if(user.username != null)
-                break;
+            switch(option) {
+                case'a':
+                    user.login();
+                    break;
+                case'b':
+                    user.signup();
+                    break;
+                case'c':
+                    System.exit(0);
+                    break;
+            }
         }
 
-
-        PSS pss = new PSS();
-
         while(run) {
-            char option = getOption();    
+            option = getOption();    
 
             switch(option) {
                 case'a':
@@ -68,11 +69,11 @@ public class Main {
 
     private static char getOption() {
         char option;
-        String prompt = "Choose PSS action.\n" +
+        String prompt = "\nChoose PSS action.\n" +
             "\ta) Create a task\n\tb) View a task\n" +
             "\tc) Delete a task\n\td) Edit a task\n" +
             "\te) Write schedule to a file\n\tf) Read schedule from a file\n" +
-            "\tg) View schedule for a day\n\th) View schedule for a weekk\n" +
+            "\tg) View schedule for a day\n\th) View schedule for a week\n" +
             "\ti) View schedule for a month\n\tj) Exit\nEnter option: ";
 
         do {
@@ -81,8 +82,21 @@ public class Main {
 
             if(option > 'j' || option < 'a')
                 System.out.println("\nInvalid input.\n");
-
         } while(option > 'j' && option < 'a');
+
+        return option;
+    }
+
+    private static char getStartOption() {
+        char option;
+
+        do {
+            System.out.print("Welcome to PSS!\n\ta) Login\n\tb) Signup\n\tc) Exit\nEnter option: ");
+            option = kb.nextLine().toLowerCase().charAt(0);
+
+            if(option > 'c' || option < 'a')
+                System.out.println("\nInvalid input.\n");
+        } while(option > 'c' && option < 'a');
 
         return option;
     }

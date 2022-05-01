@@ -1,10 +1,7 @@
 public class TransientTask extends Task {
     
-    int date;
-
     public TransientTask(String name, String type, float startTime, float duration, int date) {
-        super(name, type, startTime, duration);
-        this.date = date;
+        super(name, type, date, startTime, duration);
     }
 
     /**
@@ -20,15 +17,6 @@ public class TransientTask extends Task {
 
     public String toString() {
         return name + "\n" + type + "\n" + timeConversion() + "\n" + durationConversion() + "\n" + dateConversion(date);
-    }
-
-    /**
-     * Checks if this TransientTask occurs on a given date.
-     * @param date
-     * @return  True if this task does occur on the specified date, false otherwise.
-     */
-    public boolean doesOccurOn(int dateOther) {
-        return date == dateOther;
     }
 
     /**
@@ -58,4 +46,5 @@ public class TransientTask extends Task {
             }
         }
     }
+
 }

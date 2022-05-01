@@ -1,7 +1,8 @@
-public class Task implements Comparable<Task>{
+public class Task implements Comparable<Task> {
 
     String name;
     String type;
+    int date;
     float startTime;
     float duration;
 
@@ -9,9 +10,10 @@ public class Task implements Comparable<Task>{
         this.type = type;
     }
 
-    public Task(String name, String type, float startTime, float duration) {
+    public Task(String name, String type, int date, float startTime, float duration) {
         this.name = name;
         this.type = type;
+        this.date = date;
         this.startTime = startTime;
         this.duration = duration;
     }
@@ -105,6 +107,25 @@ public class Task implements Comparable<Task>{
         return time;
     }
 
+    public boolean conflicts(Task t) {
+        if(t.date == date) {
+            return overlaps(t);
+        }
+
+        return false;
+    }
+
+    public boolean overlaps(Task t) {
+        if(t.startTime == startTime)
+            return true;
+        else if(t.startTime < startTime && t.startTime + t.duration > startTime)
+            return true;
+        else if(t.startTime > startTime && startTime + duration > t.startTime)
+            return true;
+
+        return false;
+    }
+
     /**
      * JSON format of one task
      * @return  String of task in JSON
@@ -118,18 +139,6 @@ public class Task implements Comparable<Task>{
 
     public String toString() {
         return name + "\n" + type + "\n" + timeConversion() + "\n" + durationConversion();
-    }
-
-    /**
-     * Checks if this Task occurs on a given date. This method is not meant to be
-     * called. It is here for error detection, in case one thought they were calling the
-     * corresponding method of a subclass.
-     * @param date
-     * @return  True if this task does occur on the specified date, false otherwise.
-     */
-    public boolean doesOccurOn(int date) {
-        System.out.println("occursOn() is not meant to be supported by the Task class");
-        return false;
     }
 
     /**
@@ -153,4 +162,5 @@ public class Task implements Comparable<Task>{
             return 1;
         }
     }
+
 }

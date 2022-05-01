@@ -28,21 +28,21 @@ public class User {
             System.out.print("Enter username: ");
             newUsername = kb.nextLine();
 
-            if(newUsername.length() < 1)
+            if(newUsername.length() <= 1)
                 System.out.println("\nUsername is too short.\n");
 
             if(users.containsKey(newUsername))
                 System.out.println("\nUsername already exists.\n");
-        } while(users.containsKey(newUsername) || newUsername.length() < 1);
+        } while(users.containsKey(newUsername) || newUsername.length() <= 1);
 
         // gets password that is longer than 1 character
         do {
             System.out.print("Enter password: ");
             newPassword = kb.nextLine();
 
-            if(newPassword.length() < 1)
+            if(newPassword.length() <= 1)
                 System.out.println("\nPassword is too short.\n");
-        } while(newPassword.length() < 1);
+        } while(newPassword.length() <= 1);
         
 
         addUser(newUsername, newPassword);
@@ -124,13 +124,7 @@ public class User {
     
                 for(String user : lines) {
                     String[] split = user.split(":");
-                    if (split.length == 2) {
-                        users.put(split[0], split[1]);
-                    }
-                    else {
-                        System.out.println("Error: Read an entry in the users.txt"
-                                            + " that was in an invalid format");
-                    }
+                    users.put(split[0], split[1]);
                 }
             } catch(IOException e) {
                 System.out.println("\nError.\n");

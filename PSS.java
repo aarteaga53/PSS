@@ -1,7 +1,6 @@
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Scanner;
 
 public class PSS {
@@ -19,16 +18,29 @@ public class PSS {
      * Creates a task based on type
      */
     public void createTask() {
-        String name;
         String type = chooseType();
+        String name;
+        int count = 0;
 
-        // Gets user input for task name
-        System.out.print("Enter task name: ");
-        name = kb.nextLine();
+        do {
+            // Gets user input for task name
+            System.out.print("Enter task name: ");
+            name = kb.nextLine();
+
+            if(name.length() <= 1) {
+                System.out.println("\nName is too short.\n");
+                count++;
+            }
+        } while(name.length() <= 1 && count < 3);
+
+        if(count == 3) {
+            System.out.println("\nToo many attempts.");
+            return;
+        }
 
         // checks if the name is unique
         if(!uniqueName(name)) {
-            System.out.println("\nTask name is already taken.\n");
+            System.out.println("\nTask name is already taken.");
             return;
         }
         
@@ -48,12 +60,12 @@ public class PSS {
      * Gets user input for task type
      */
     private String chooseType() {
-        String option;
-        Task newTask;
         String prompt = "Choose task type:\n" +
                         "\tClass - Recurring\n\tStudy - Recurring\n\tSleep - Recurring\n\tExercise - Recurring\n\tWork - Recurring\n\tMeal - Recurring\n" +
                         "\tVisit - Transient\n\tShopping - Transient\n\tAppointment - Transient\n" +
-                        "\tCancellation - Anti\nEnter option: ";
+                        "\tCancellation - Anti\nEnter type: ";
+        String option;
+        Task newTask;
 
         // Gets user input for task type
         do {
@@ -78,67 +90,60 @@ public class PSS {
         String startTime;
         String duration;
         String date;
+        int count = 0;
 
+        // gets user input for start time
         do {
-            // gets user input for start time
-            do {
-                System.out.print("Enter task start time(hh:mm am/pm): ");
-                startTime = kb.nextLine();
-            } while(!isStartTimeCorrect(startTime));
+            System.out.print("Enter task start time(hh:mm am/pm): ");
+            startTime = kb.nextLine();
 
-            // gets user input for duration
-            do {
-                System.out.print("Enter task duration(hh:mm): ");
-                duration = kb.nextLine();
-            } while(!isDurationCorrect(duration));
+            if(!isStartTimeCorrect(startTime))
+                count++;
+        } while(!isStartTimeCorrect(startTime) && count < 3);
 
-            // gets user input for date
-            do {
-                System.out.print("Enter task date(mm/dd/yyyy): ");
-                date = kb.nextLine();
-            } while(!isDateCorrect(date));
+        if(count == 3) {
+            System.out.println("\nToo many attempts.");
+            return;
+        }
+        else
+            count = 0;
 
-            newTask = new AntiTask(name, type, timeConversion(startTime), durationConversion(duration), dateConversion(date));
+        // gets user input for duration
+        do {
+            System.out.print("Enter task duration(hh:mm): ");
+            duration = kb.nextLine();
 
-            if(antiConflicts(newTask))
-                System.out.println("\nAnti Task does not cancel a recurring task.\n");
-        } while(antiConflicts(newTask));
-        
-        tasks.add(newTask);
-    }
+            if(!isDurationCorrect(duration))
+                count++;
+        } while(!isDurationCorrect(duration) && count < 3);
 
-    // I think this method may return true if there is atleast one recurring task it does NOT
-    // cancel out. It may have to be modified to return true if there is atleast one recurring
-    // task it cancels out.
-    private boolean antiConflicts(AntiTask newTask) { 
-        for(Task t : tasks) {               
-            if(t.isRecurring()) {
-                RecurringTask temp = (RecurringTask) t;
+        if(count == 3) {
+            System.out.println("\nToo many attempts.");
+            count++;
+        }
+        else
+            count = 0;
 
-                if(temp.startDate != newTask.date) {
-                    if(temp.startTime != newTask.startTime || temp.duration != newTask.duration)
-                        return true;
-                }
-            }
+        // gets user input for date
+        do {
+            System.out.print("Enter task date(mm/dd/yyyy): ");
+            date = kb.nextLine();
+
+            if(!isDateCorrect(date))
+                count++;
+        } while(!isDateCorrect(date) && count < 3);
+
+        if(count == 3) {
+            System.out.println("\nToo many attempts.");
+            count++;
         }
 
-        return false;
-    }
+        newTask = new AntiTask(name, type, timeConversion(startTime), durationConversion(duration), dateConversion(date));
 
-    /**
-     * Checks if a specified antitask and transient task (which should represent one instance of
-     * a recurring task) cancel each other out.
-     * @param aTask     An antitask.
-     * @param tTask     One instance of a recurring task that may or may not be canceled by the
-     *                  anti task.
-     * @return      True if the instance of the antitask and the recurring task cancel each other out.
-     */
-    private boolean antiConflicts(AntiTask aTask, TransientTask tTask) {
-        if(tTask.date == aTask.date) {
-            if(tTask.startTime == aTask.startTime || tTask.duration == aTask.duration)
-                return true;
-        }
-        return false;
+        if(conflicts(newTask))
+            System.out.println("\nAnti Task does not cancel a recurring task.");
+        else
+            tasks.add(newTask);
     }
 
     /**
@@ -151,27 +156,60 @@ public class PSS {
         String startTime;
         String duration;
         String date;
+        int count = 0;
 
         // gets user input for start time
         do {
             System.out.print("Enter task start time(hh:mm am/pm): ");
             startTime = kb.nextLine();
-        } while(!isStartTimeCorrect(startTime));
+
+            if(!isStartTimeCorrect(startTime))
+                count++;
+        } while(!isStartTimeCorrect(startTime) && count < 3);
+
+        if(count == 3) {
+            System.out.println("\nToo many attempts.");
+            return;
+        }
+        else
+            count = 0;
 
         // gets user input for duration
         do {
             System.out.print("Enter task duration(hh:mm): ");
             duration = kb.nextLine();
-        } while(!isDurationCorrect(duration));
 
-        // gets uer input for date
+            if(!isDurationCorrect(duration))
+                count++;
+        } while(!isDurationCorrect(duration) && count < 3);
+
+        if(count == 3) {
+            System.out.println("\nToo many attempts.");
+            count++;
+        }
+        else
+            count = 0;
+
+        // gets user input for date
         do {
             System.out.print("Enter task date(mm/dd/yyyy): ");
             date = kb.nextLine();
-        } while(!isDateCorrect(date));
+
+            if(!isDateCorrect(date))
+                count++;
+        } while(!isDateCorrect(date) && count < 3);
+
+        if(count == 3) {
+            System.out.println("\nToo many attempts.");
+            count++;
+        }
 
         newTask = new TransientTask(name, type, timeConversion(startTime), durationConversion(duration), dateConversion(date));
-        tasks.add(newTask);
+
+        if(conflicts(newTask))
+            System.out.println("\nThis task conflicts with an existing task.");
+        else
+            tasks.add(newTask);
     }
 
     /**
@@ -186,88 +224,105 @@ public class PSS {
         String startDate;
         String endDate;
         String frequency;
+        int count = 0;
 
+        // gets user input for start time
         do {
-            // gets user input for start time
-            do {
-                System.out.print("Enter task start time(hh:mm am/pm): ");
-                startTime = kb.nextLine();
-            } while(!isStartTimeCorrect(startTime));
+            System.out.print("Enter task start time(hh:mm am/pm): ");
+            startTime = kb.nextLine();
 
-            // gets user input for duration
-            do {
-                System.out.print("Enter task duration(hh:mm): ");
-                duration = kb.nextLine();
-            } while(!isDurationCorrect(duration));
+            if(!isStartTimeCorrect(startTime))
+                count++;
+        } while(!isStartTimeCorrect(startTime) && count < 3);
 
-            // gets user input for start date
-            do {
-                System.out.print("Enter task start date(mm/dd/yyyy): ");
-                startDate = kb.nextLine();
-            } while(!isDateCorrect(startDate));
+        if(count == 3) {
+            System.out.println("\nToo many attempts.");
+            return;
+        }
+        else
+            count = 0;
+
+        // gets user input for duration
+        do {
+            System.out.print("Enter task duration(hh:mm): ");
+            duration = kb.nextLine();
+
+            if(!isDurationCorrect(duration))
+                count++;
+        } while(!isDurationCorrect(duration) && count < 3);
+
+        if(count == 3) {
+            System.out.println("\nToo many attempts.");
+            return;
+        }
+        else
+            count = 0;
+
+        // gets user input for start date
+        do {
+            System.out.print("Enter task start date(mm/dd/yyyy): ");
+            startDate = kb.nextLine();
+
+            if(!isDateCorrect(startDate))
+                count++;
+        } while(!isDateCorrect(startDate) && count < 3);
+
+        if(count == 3) {
+            System.out.println("\nToo many attempts.");
+            return;
+        }
+        else
+            count = 0;
             
-            // gets user input for end date
-            do {
-                System.out.print("Enter task end date(mm/dd/yyyy): ");
-                endDate = kb.nextLine();
-            } while(!isEndDateCorrect(startDate, endDate));
+        // gets user input for end date
+        do {
+            System.out.print("Enter task end date(mm/dd/yyyy): ");
+            endDate = kb.nextLine();
 
-            // gets user input for frequency
-            do {
-                System.out.print("Enter task frequency(1/7): ");
-                frequency = kb.nextLine();
-            } while(!isFrequencyCorrect(frequency));
+            if(!isEndDateCorrect(startDate, endDate))
+                count++;
+        } while(!isEndDateCorrect(startDate, endDate) && count < 3);
 
-            newTask = new RecurringTask(name, type, timeConversion(startTime), durationConversion(duration), dateConversion(startDate), dateConversion(endDate), Integer.parseInt(frequency));
+        if(count == 3) {
+            System.out.println("\nToo many attempts.");
+            return;
+        }
+        else
+            count = 0;
 
-            if(recurringConflicts(newTask))
-                System.out.println("\nThis task conflicts with an existing task.\n");
-        } while(recurringConflicts(newTask));
-        
+        // gets user input for frequency
+        do {
+            System.out.print("Enter task frequency(1/7): ");
+            frequency = kb.nextLine();
 
-        tasks.add(newTask);
-    }
+            if(!isFrequencyCorrect(frequency))
+                count++;
+        } while(!isFrequencyCorrect(frequency) && count < 3);
 
-    private boolean recurringConflicts(RecurringTask newTask) {
-        for(Task t : tasks) {
-            if(t.isRecurring()) {
-                RecurringTask temp = (RecurringTask) t;
-
-                if(temp.startDate == newTask.startDate || (temp.startDate < newTask.startDate && temp.endDate > newTask.startDate)) {
-                    if(temp.startTime == newTask.startTime)
-                        return true;
-                    else if(newTask.startTime < temp.startTime && newTask.startTime + newTask.duration > temp.startTime)
-                        return true;
-                    else if(newTask.startTime > temp.startTime && temp.startTime + temp.duration > newTask.startTime)
-                        return true;
-                }
-            }
-            else if(t.isTransient()) {
-                TransientTask temp = (TransientTask) t;
-
-                if(temp.date >= newTask.startDate && temp.date <= newTask.endDate) {
-                    if(temp.startTime == newTask.startTime)
-                        return true;
-                    else if(newTask.startTime < temp.startTime && newTask.startTime + newTask.duration > temp.startTime)
-                        return true;
-                    else if(newTask.startTime > temp.startTime && temp.startTime + temp.duration > newTask.startTime)
-                        return true;
-                }
-            }
-            else {
-                AntiTask temp = (AntiTask) t;
-
-                if(temp.date >= newTask.startDate && temp.date <= newTask.endDate) {
-                    if(temp.startTime == newTask.startTime)
-                        return true;
-                    else if(newTask.startTime < temp.startTime && newTask.startTime + newTask.duration > temp.startTime)
-                        return true;
-                    else if(newTask.startTime > temp.startTime && temp.startTime + temp.duration > newTask.startTime)
-                        return true;
-                }
-            }
+        if(count == 3) {
+            System.out.println("\nToo many attempts.");
+            return;
         }
 
+        newTask = new RecurringTask(name, type, timeConversion(startTime), durationConversion(duration), dateConversion(startDate), dateConversion(endDate), Integer.parseInt(frequency));
+
+        if(conflicts(newTask))
+            System.out.println("\nThis task conflicts with an existing task.");
+        else
+            tasks.add(newTask);
+    }
+
+    /**
+     * Checks if there is any conflicts with a new task being created
+     * @param newTask
+     * @return
+     */
+    private boolean conflicts(Task newTask) {
+        for(Task task : tasks) {
+            if(task.conflicts(newTask))
+                return true;
+        }
+            
         return false; 
     }
 
@@ -474,8 +529,8 @@ public class PSS {
      * @return
      */
     private boolean uniqueName(String name) {
-        for(Task t : tasks) 
-            if(t.name.equals(name))
+        for(Task task : tasks) 
+            if(task.name.equals(name))
                 return false;
 
         return true;
@@ -488,12 +543,12 @@ public class PSS {
     public void viewTask(String name) {
         for(Task t : tasks) {
             if(t.name.equals(name)) {
-                System.out.println("\n" + t.toString() + "\n");
+                System.out.println("\n" + t.toString());
                 return;
             }
         }
 
-        System.out.println("\nTask not found.\n");
+        System.out.println("\nTask not found.");
     }
 
     /**
@@ -504,11 +559,11 @@ public class PSS {
         for(Task t : tasks)
             if(t.name.equals(name)) {
                 tasks.remove(t);
-                System.out.println("\nTask deleted.\n");
+                System.out.println("\nTask deleted.");
                 return;
             }
 
-        System.out.println("\nTask not found.\n");
+        System.out.println("\nTask not found.");
     }
 
     /**
@@ -522,7 +577,7 @@ public class PSS {
                 return;
             }
 
-        System.out.println("\nTask not found.\n");
+        System.out.println("\nTask not found.");
     }
 
     /**
@@ -539,7 +594,7 @@ public class PSS {
             filename = kb.nextLine();
 
             if(!filename.contains(".json"))
-                System.out.println("\nMust be JSON file.\n");
+                System.out.println("\nMust be JSON file.");
         } while(!filename.contains(".json"));
         
         // checks if the file exists
@@ -569,7 +624,7 @@ public class PSS {
             filename = kb.nextLine();
 
             if(!filename.contains(".json"))
-                System.out.println("\nMust be JSON file.\n");
+                System.out.println("\nMust be JSON file.");
         } while(!filename.contains(".json"));
         
         // checks if the file exists
@@ -581,69 +636,86 @@ public class PSS {
         }
     }
 
-    /**
-     * Asks the user to enter a date and returns the schedule for that date, sorted by time.
-     */
     public void daySchedule() {
         String startDate;
+        int count = 0;
+
         // gets user input for start date
         do {
-            System.out.print("Enter a date to see its tasks (mm/dd/yyyy): ");
+            System.out.print("Enter day to view tasks(mm/dd/yyyy): ");
             startDate = kb.nextLine();
-        } while(!isDateCorrect(startDate));
+
+            if(!isDateCorrect(startDate))
+                count++;
+        } while(!isDateCorrect(startDate) && count < 3);
+
+        if(count == 3) {
+            System.out.println("\nToo many attempts.");
+            return;
+        }
 
         int date = dateConversion(startDate);
+        ArrayList<Task> tasksInDay = getTasksInPeriod(date, 7);
 
-        List<Task> tasksInPeriod = getTasksInPeriod(date, 1);
+        Collections.sort(tasksInDay);
 
-        Collections.sort(tasksInPeriod);
-
-        for (Task task: tasksInPeriod){
+        for (Task task : tasksInDay) {
             System.out.println("\n" + task.toString() + "\n");
         }
     }
 
-    /**Asks the user to enter a date and returns the schedule from that date up to and
-     * excluding 7 days later.
-     */
     public void weekSchedule() {
         String startDate;
+        int count = 0;
+
         // gets user input for start date
         do {
-            System.out.print("Enter a date to see the tasks from the date to a week later (mm/dd/yyyy): ");
+            System.out.print("Enter day to view tasks(mm/dd/yyyy): ");
             startDate = kb.nextLine();
-        } while(!isDateCorrect(startDate));
+
+            if(!isDateCorrect(startDate))
+                count++;
+        } while(!isDateCorrect(startDate) && count < 3);
+
+        if(count == 3) {
+            System.out.println("\nToo many attempts.");
+            return;
+        }
 
         int date = dateConversion(startDate);
+        ArrayList<Task> tasksInWeek = getTasksInPeriod(date, 7);
 
-        List<Task> tasksInPeriod = getTasksInPeriod(date, 7);
+        Collections.sort(tasksInWeek);
 
-        Collections.sort(tasksInPeriod);
-
-        for (Task task: tasksInPeriod){
+        for (Task task : tasksInWeek) {
             System.out.println("\n" + task.toString() + "\n");
         }
     }
 
-    /**
-     * Asks the user for a date and returns the schedule from that date up to
-     * and excluding 30 days later.
-     */
     public void monthSchedule() {
         String startDate;
+        int count = 0;
+
         // gets user input for start date
         do {
-            System.out.print("Enter a date to see the tasks from the date to a month later (mm/dd/yyyy): ");
+            System.out.print("Enter day to view tasks(mm/dd/yyyy): ");
             startDate = kb.nextLine();
-        } while(!isDateCorrect(startDate));
+
+            if(!isDateCorrect(startDate))
+                count++;
+        } while(!isDateCorrect(startDate) && count < 3);
+
+        if(count == 3) {
+            System.out.println("\nToo many attempts.");
+            return;
+        }
 
         int date = dateConversion(startDate);
+        ArrayList<Task> tasksInMonth = getTasksInPeriod(date, 30);
 
-        List<Task> tasksInPeriod = getTasksInPeriod(date, 30);
+        Collections.sort(tasksInMonth);
 
-        Collections.sort(tasksInPeriod);
-
-        for (Task task: tasksInPeriod){
+        for (Task task : tasksInMonth) {
             System.out.println("\n" + task.toString() + "\n");
         }
     }
@@ -655,62 +727,24 @@ public class PSS {
      * @param durationInDays
      * @return
      */
-    private List<Task> getTasksInPeriod(int startDate, int durationInDays) {
-        List<Task> tasksInPeriod = new ArrayList<Task>();
-        int date = startDate;
+    private ArrayList<Task> getTasksInPeriod(int date, int durationInDays) {
+        ArrayList<Task> tasksInPeriod = new ArrayList<Task>();
+        RecurringTask day = new RecurringTask("Day", "Class", 0, (float) 23.75, date, date, 1);
+        int next = date;
         int count = 0;
-        while (count < durationInDays) {
-            for (Task task: getTasksInDay(date)) {
+
+        while(count < durationInDays) {
+            for(Task task : getTasksInDay(day)) {
                 tasksInPeriod.add(task);
             }
-            date = incrementDate(date);
-            count += 1;
+
+            next = day.nextDate(next, 1);
+            day.date = next;
+            day.endDate = next;
+            count++;
         }
+
         return tasksInPeriod;
-    }
-
-    /**
-     * Calculates the date of the day after the given date, accounting for leap year.
-     * @param date
-     * @return  The date of the day after the given date.
-     */
-    private int incrementDate(int date) {
-        int next = date;
-        int year = (next - next % 10000) / 10000;
-        int month = ((next - next % 100) - year * 10000) / 100;
-        int day = next - year * 10000 - month * 100;
-
-        day += 1;
-
-        if((month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) && day > 31) {
-            if(month == 12) {
-                year++;
-                month = 1;
-                day -= 31;
-            }
-            else {
-                month++;
-                day -= 31;
-            }
-        }
-        else if((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) {
-            month++;
-            day -= 30;
-        }
-        else if(month == 2 && day > 28) {
-            if(year % 4 == 0 && year % 100 == 0 && year % 400 == 0 && day > 29) {
-                month++;
-                day -= 29;
-            }
-            else {
-                month++;
-                day -= 28;
-            }
-        }
-
-        next = year * 10000 + month * 100 + day;
-
-        return next;
     }
 
     /**
@@ -718,47 +752,30 @@ public class PSS {
      * @param date
      * @return 
      */
-    private List<Task> getTasksInDay(int date) {
-        List<Task> tasksInDay = new ArrayList<Task>();
-        List<Task> antiTasksInDay = new ArrayList<Task>();
-        for (Task task: tasks) {
-            if (task.doesOccurOn(date)) {
-                if (task.isRecurring()) {
-                    TransientTask tTask = recurringToTransient((RecurringTask)task, date);
-                    tasksInDay.add(tTask);
+    private ArrayList<Task> getTasksInDay(RecurringTask day) {
+        ArrayList<Task> tasksInDay = new ArrayList<Task>();
+
+        for(Task task : tasks) {
+            if (day.conflicts(task)) {
+                if(task.isRecurring()) {
+                    RecurringTask temp = (RecurringTask) task;
+                    TransientTask t = new TransientTask(temp.name, temp.type, temp.startTime, temp.duration, day.date);
+
+                    if(temp.links.size() > 0) {
+                        for(AntiTask a : temp.links)
+                            if(!day.conflicts(a))
+                                tasksInDay.add(t);
+                    }
+                    else
+                        tasksInDay.add(t);
                 }
-                else if (task.isAnti()) {
-                    antiTasksInDay.add(task);
-                }
-                else if (task.isTransient()) {
+                else if(task.isTransient()) {
                     tasksInDay.add(task);
                 }
-                else {
-                    System.out.println("getTasksInDay found an invalid task");
-                }
             }
         }
-        // removes occurances of recurring tasks that are canceled by an antitask
-        for (Task antiTask: antiTasksInDay) {
-            for (Task task: tasksInDay) { 
-                if (task.isRecurring()) {  // actually a transient occurance of a recurring task
-                    if (antiConflicts((AntiTask)antiTask, (TransientTask)task)) {
-                        tasksInDay.remove(task);
-                    }
-                }
-            }
-        }
+
         return tasksInDay;
     }
-
-    /**
-     * Creates a transient task on a given date representing one occurance of a 
-     * recurring task. Does not check if the recurring task actually occurs on the
-     * given date or not.
-     */
-    private TransientTask recurringToTransient(RecurringTask rTask, int date) {
-        return new TransientTask(rTask.name, rTask.type, rTask.startTime, rTask.duration, date);
-    }
-
 
 }
