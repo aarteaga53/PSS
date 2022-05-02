@@ -26,12 +26,11 @@ public class TransientTask extends Task {
      * @return      an integer representing whether this class is less than, equal to,
      *              or greater than the specified task.
      */
-    public int compareTo(Task taskOther) {
-        TransientTask other = (TransientTask) taskOther;
-        if (date < other.date) {
+    public int compareTo(Task other) {
+        if(date < other.date) {
             return -1;
         }
-        else if (date > other.date) {
+        else if(date > other.date) {
             return 1;
         }
         else {

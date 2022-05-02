@@ -384,6 +384,8 @@ public class PSS {
             return false;
         else if(minute < 0 || minute > 59)
             return false;
+        else if(hour == 23 && minute > 45)
+            return false;
         else if(hour == 0 && minute == 0)
             return false;
 
@@ -636,6 +638,9 @@ public class PSS {
         }
     }
 
+    /**
+     * Creates a schedule for a single day in increasing order from time
+     */
     public void daySchedule() {
         String startDate;
         int count = 0;
@@ -664,6 +669,9 @@ public class PSS {
         }
     }
 
+    /**
+     * Creates a schedule for a week in increasing order from time and day
+     */
     public void weekSchedule() {
         String startDate;
         int count = 0;
@@ -692,6 +700,9 @@ public class PSS {
         }
     }
 
+    /**
+     * Creates a schedule for a month in increasing order from time and day
+     */
     public void monthSchedule() {
         String startDate;
         int count = 0;
@@ -721,8 +732,7 @@ public class PSS {
     }
 
     /**
-     * Returns a list of tasks occuring within a given period without
-     * canceled recurring tasks.
+     * Returns a list of tasks occuring within a given period
      * @param startDate
      * @param durationInDays
      * @return
@@ -748,7 +758,7 @@ public class PSS {
     }
 
     /**
-     * Returns a list of tasks for a given date without canceled recurring tasks.
+     * Returns a list of tasks for a given date
      * @param date
      * @return 
      */
