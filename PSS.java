@@ -560,7 +560,24 @@ public class PSS {
     public void deleteTask(String name) {
         for(Task t : tasks)
             if(t.name.equals(name)) {
-                tasks.remove(t);
+                if(t.isAnti()){
+                    
+                }
+                else if(t.isRecurring()){
+                    RecurringTask temp = (RecurringTask) t;
+
+                    if(temp.links.size() > 0){
+                        for (AntiTask anti : temp.links) {
+                            tasks.remove(anti);
+                        }
+                    }
+
+                    tasks.remove(t);
+                }
+                else{
+                    tasks.remove(t);
+                }
+
                 System.out.println("\nTask deleted.");
                 return;
             }
