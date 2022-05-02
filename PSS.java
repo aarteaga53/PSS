@@ -634,7 +634,7 @@ public class PSS {
             dataFile.read(tasks, filepath + filename);
         }
         else {
-            System.out.println("\nFile does not exist.\n");
+            System.out.println("\nFile does not exist.");
         }
     }
 
@@ -660,7 +660,7 @@ public class PSS {
         }
 
         int date = dateConversion(startDate);
-        ArrayList<Task> tasksInDay = getTasksInPeriod(date, 7);
+        ArrayList<Task> tasksInDay = getTasksInPeriod(date, 1);
 
         Collections.sort(tasksInDay);
 
