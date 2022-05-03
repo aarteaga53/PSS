@@ -10,95 +10,112 @@ public class Main {
         PSS pss = new PSS();
         char option;
 
-        while(user.username == null) {
-            option = getStartOption();
-
-            switch(option) {
-                case'a':
-                    user.login();
-                    break;
-                case'b':
-                    user.signup();
-                    break;
-                case'c':
-                    System.exit(0);
-                    break;
-            }
-        }
-
         while(run) {
-            option = getOption();    
+            while(user.username == null && run) {
+                option = getStartOption();
 
-            switch(option) {
-                case'a':
-                    pss.createTask();
-                    break;
-                case'b':
-                    System.out.print("Enter task name: ");
-                    pss.viewTask(kb.nextLine());
-                    break;
-                case'c':
-                    System.out.print("Enter task name: ");
-                    pss.deleteTask(kb.nextLine());
-                    break;
-                case'd':
-                    System.out.print("Enter task name: ");
-                    pss.editTask(kb.nextLine());
-                    break;
-                case'e':
-                    pss.writeSchedule(user.username);
-                    break;
-                case'f':
-                    pss.readSchedule(user.username);
-                    break;
-                case'g':
-                    pss.daySchedule();
-                    break;
-                case'h':
-                    pss.weekSchedule();
-                    break;
-                case'i':
-                    pss.monthSchedule();
-                    break;
-                case'j':
-                    run = false;
-                    break;
+                switch(option) {
+                    case'a':
+                        user.login();
+                        break;
+                    case'b':
+                        user.signup();
+                        break;
+                    case'c':
+                        run = false;
+                        break;
+                }
+            }
+
+            while(user.username != null && run) {
+                option = getOption();    
+
+                switch(option) {
+                    case'a':
+                        pss.createTask();
+                        break;
+                    case'b':
+                        System.out.print("Enter task name: ");
+                        pss.viewTask(kb.nextLine());
+                        break;
+                    case'c':
+                        System.out.print("Enter task name: ");
+                        pss.deleteTask(kb.nextLine());
+                        break;
+                    case'd':
+                        System.out.print("Enter task name: ");
+                        pss.editTask(kb.nextLine());
+                        break;
+                    case'e':
+                        pss.writeSchedule(user.username);
+                        break;
+                    case'f':
+                        pss.readSchedule(user.username);
+                        break;
+                    case'g':
+                        pss.daySchedule();
+                        break;
+                    case'h':
+                        pss.weekSchedule();
+                        break;
+                    case'i':
+                        pss.monthSchedule();
+                        break;
+                    case'j':
+                        user = new User();
+                        break;
+                    case'k':
+                        run = false;
+                        break;
+                }
             }
         }
     }
 
     private static char getOption() {
-        char option;
+        String option;
         String prompt = "\nChoose PSS action.\n" +
             "\ta) Create a task\n\tb) View a task\n" +
             "\tc) Delete a task\n\td) Edit a task\n" +
             "\te) Write schedule to a file\n\tf) Read schedule from a file\n" +
             "\tg) View schedule for a day\n\th) View schedule for a week\n" +
-            "\ti) View schedule for a month\n\tj) Exit\nEnter option: ";
+            "\ti) View schedule for a month\n\tj) Logout\n\tk) Exit\nEnter option: ";
 
         do {
             System.out.print(prompt);
-            option = kb.nextLine().toLowerCase().charAt(0);
+            option = kb.nextLine();
 
-            if(option > 'j' || option < 'a')
+            if(!isOptionValid(option, 'a', 'k'))
                 System.out.println("\nInvalid input.\n");
-        } while(option > 'j' && option < 'a');
+        } while(!isOptionValid(option, 'a', 'k'));
 
-        return option;
+        return option.toLowerCase().charAt(0);
     }
 
     private static char getStartOption() {
-        char option;
+        String option;
 
         do {
             System.out.print("Welcome to PSS!\n\ta) Login\n\tb) Signup\n\tc) Exit\nEnter option: ");
-            option = kb.nextLine().toLowerCase().charAt(0);
+            option = kb.nextLine();
 
-            if(option > 'c' || option < 'a')
+            if(!isOptionValid(option, 'a', 'c'))
                 System.out.println("\nInvalid input.\n");
-        } while(option > 'c' && option < 'a');
+        } while(!isOptionValid(option, 'a', 'c'));
 
-        return option;
+        return option.toLowerCase().charAt(0);
+    }
+
+    private static boolean isOptionValid(String option, char lower, char upper) {
+        if(option.length() != 1)
+            return false;
+
+        char op = option.toLowerCase().charAt(0);
+
+        if(op > upper || op < lower)
+            return false;
+
+        return true;
     }
 
 }

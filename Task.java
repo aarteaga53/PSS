@@ -107,20 +107,20 @@ public class Task implements Comparable<Task> {
         return time;
     }
 
-    public boolean conflicts(Task t) {
-        if(t.date == date) {
-            return overlaps(t);
+    public boolean conflicts(Task task) {
+        if(task.date == date) {
+            return overlaps(task);
         }
 
         return false;
     }
 
-    public boolean overlaps(Task t) {
-        if(t.startTime == startTime)
+    public boolean overlaps(Task task) {
+        if(task.startTime == startTime)
             return true;
-        else if(t.startTime < startTime && t.startTime + t.duration > startTime)
+        else if(task.startTime < startTime && task.startTime + task.duration > startTime)
             return true;
-        else if(t.startTime > startTime && startTime + duration > t.startTime)
+        else if(task.startTime > startTime && startTime + duration > task.startTime)
             return true;
 
         return false;
@@ -151,7 +151,7 @@ public class Task implements Comparable<Task> {
      *              or greater than the specified task.
      */
     public int compareTo(Task taskOther) {
-        System.out.println("compareTo() is not meant to be supported by the Task class");
+        //System.out.println("compareTo() is not meant to be supported by the Task class");
         if (startTime < taskOther.startTime) {
             return -1;
         }

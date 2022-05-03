@@ -543,9 +543,9 @@ public class PSS {
      * @param name
      */
     public void viewTask(String name) {
-        for(Task t : tasks) {
-            if(t.name.equals(name)) {
-                System.out.println("\n" + t.toString());
+        for(Task task : tasks) {
+            if(task.name.equals(name)) {
+                System.out.println("\n" + task.toString());
                 return;
             }
         }
@@ -558,24 +558,24 @@ public class PSS {
      * @param name
      */
     public void deleteTask(String name) {
-        for(Task t : tasks)
-            if(t.name.equals(name)) {
-                if(t.isAnti()){
+        for(Task task : tasks)
+            if(task.name.equals(name)) {
+                if(task.isAnti()) {
                     
                 }
-                else if(t.isRecurring()){
-                    RecurringTask temp = (RecurringTask) t;
+                else if(task.isRecurring()) {
+                    RecurringTask temp = (RecurringTask) task;
 
-                    if(temp.links.size() > 0){
+                    if(temp.links.size() > 0) {
                         for (AntiTask anti : temp.links) {
                             tasks.remove(anti);
                         }
                     }
 
-                    tasks.remove(t);
+                    tasks.remove(task);
                 }
                 else{
-                    tasks.remove(t);
+                    tasks.remove(task);
                 }
 
                 System.out.println("\nTask deleted.");
@@ -590,8 +590,8 @@ public class PSS {
      * @param name
      */
     public void editTask(String name) {
-        for(Task t : tasks)
-            if(t.name.equals(name)) {
+        for(Task task : tasks)
+            if(task.name.equals(name)) {
 
                 return;
             }

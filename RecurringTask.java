@@ -33,20 +33,20 @@ public class RecurringTask extends Task {
     }
 
     /**
-     * Checks if a given task conflicts with this task
+     * Checks if a task's times conflict
      */
-    public boolean conflicts(Task t) {
-        if(overlaps(t)) {
+    public boolean conflicts(Task task) {
+        if(overlaps(task)) {
             int next = date;
 
-            if(!t.isRecurring()) {
-                while(next <= endDate && next <= t.date) {
-                    if(next == t.date) {
-                        if((t.isAnti() && (t.startTime == startTime && t.duration == duration)) && !hasLink(t)) {
-                            addLink((AntiTask) t);
+            if(!task.isRecurring()) {
+                while(next <= endDate && next <= task.date) {
+                    if(next == task.date) {
+                        if((task.isAnti() && (task.startTime == startTime && task.duration == duration)) && !hasLink(task)) {
+                            addLink((AntiTask) task);
                             return false;
                         }
-                        else if(t.isTransient() && hasLink(t))
+                        else if(task.isTransient() && hasLink(task))
                             return false;   
                         else
                             return true;
@@ -58,7 +58,7 @@ public class RecurringTask extends Task {
             else {
                 ArrayList<Integer> dates = new ArrayList<>();
                 ArrayList<Integer> otherDates = new ArrayList<>();
-                RecurringTask r = (RecurringTask) t;
+                RecurringTask r = (RecurringTask) task;
 
                 while(next <= endDate) {
                     dates.add(next);
@@ -76,18 +76,6 @@ public class RecurringTask extends Task {
                     if(otherDates.contains(d))
                         return true;
                 }
-                // RecurringTask rt = (RecurringTask) t;
-                // next = rt.date < date ? rt.date : date;
-                // int ed = rt.date < date ? rt.endDate : endDate;
-                // int sd = rt.date < date ? date : rt.date;
-                // int freq = rt.date < date ? rt.frequency : frequency;
-
-                // while(next <= ed && next <= sd) {
-                //     if(next == sd)
-                //         return true;
-
-                //     next = nextDate(next, freq);
-                // } 
             }
             
         }

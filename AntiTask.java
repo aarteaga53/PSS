@@ -28,10 +28,10 @@ public class AntiTask extends Task {
         return false;
     }
 
-    public boolean conflicts(Task t) {
-        if(t.date == date && overlaps(t)) {
-            if(t.isTransient() && !hasLink(t)) {
-                addLink((TransientTask) t);
+    public boolean conflicts(Task task) {
+        if(task.date == date && overlaps(task)) {
+            if(task.isTransient() && !hasLink(task)) {
+                addLink((TransientTask) task);
                 return false;
             }
             else
