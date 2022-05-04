@@ -457,8 +457,12 @@ public class PSS {
         else if((month == 4 || month == 6 || month == 9 || month == 11) && day > 30)
             return false;
         else if(month == 2) {
-            if(year % 4 == 0 && year % 100 == 0 && year % 400 == 0 && day > 29)
-                return false;
+            if(year % 4 == 0) {
+                if(year % 100 == 0) {
+                    if(year % 400 == 0 && day > 29)
+                        return false;
+                }
+            }
             else if(day > 28)
                 return false;
         }
@@ -531,9 +535,11 @@ public class PSS {
      * @return
      */
     private boolean uniqueName(String name) {
-        for(Task task : tasks) 
+        for(Task task : tasks) {
             if(task.name.equals(name))
                 return false;
+        }
+        
 
         return true;
     }
@@ -561,23 +567,35 @@ public class PSS {
         for(Task task : tasks)
             if(task.name.equals(name)) {
                 if(task.isAnti()) {
-                    
+                    AntiTask temp = (AntiTask) task;
+
+                    if(temp.links.size() > 0) {
+                        System.out.println("\nTask could not be removed.");
+                        return;
+                    }
+                    else {
+                        RecurringTask link = temp.linkedTo;
+
+                        link.removeLink(temp);
+                    }          
                 }
                 else if(task.isRecurring()) {
                     RecurringTask temp = (RecurringTask) task;
 
                     if(temp.links.size() > 0) {
-                        for (AntiTask anti : temp.links) {
-                            tasks.remove(anti);
+                        for (AntiTask a : temp.links) {
+                            tasks.remove(a);
                         }
                     }
-
-                    tasks.remove(task);
                 }
-                else{
-                    tasks.remove(task);
+                else if(task.isTransient()) {
+                    TransientTask temp = (TransientTask) task;
+                    AntiTask link = temp.linkedTo;
+
+                    link.removeLink(temp);
                 }
 
+                tasks.remove(task);
                 System.out.println("\nTask deleted.");
                 return;
             }

@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class RecurringTask extends Task {
+public class RecurringTask extends Task implements Cloneable {
 
     int endDate;
     int frequency;
@@ -15,6 +15,12 @@ public class RecurringTask extends Task {
 
     public void addLink(AntiTask link) {
         links.add(link);
+
+        try {
+            link.linkTo(clone());
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void removeLink(AntiTask link) {
@@ -110,13 +116,25 @@ public class RecurringTask extends Task {
             month++;
             day -= 30;
         }
-        else if(month == 2 && day > 28) {
-            if(year % 4 == 0 && year % 100 == 0 && year % 400 == 0 && day > 29)
-                day--;
-        
+        else if(month == 2) {
+            if(year % 4 == 0) {
+                if(year % 100 == 0) {
+                    if(year % 400 == 0 && day > 29)
+                        day -= 29;
+                }
+            }
+            else if(day > 28)
+                day -= 28;
+
             month++;
-            day -= 28;
         }
+        // else if(month == 2 && day > 28) {
+        //     if(year % 4 == 0 && year % 100 == 0 && year % 400 == 0 && day > 29)
+        //         day--;
+        
+        //     month++;
+        //     day -= 28;
+        // }
 
         return year * 10000 + month * 100 + day;
     }
@@ -136,6 +154,11 @@ public class RecurringTask extends Task {
 
     public String toString() {
         return name + "\n" + type + "\n" + timeConversion() + "\n" + durationConversion() + "\n" + dateConversion(date) + "\n" + dateConversion(endDate) + "\n" + ((frequency == 1) ? "Daily" : "Weekly");
+    }
+
+    @Override
+    public RecurringTask clone() throws CloneNotSupportedException {
+        return (RecurringTask) super.clone();    // return shallow copy
     }
 
 }

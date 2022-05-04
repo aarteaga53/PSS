@@ -1,7 +1,22 @@
 public class TransientTask extends Task {
+
+    AntiTask linkedTo;
     
     public TransientTask(String name, String type, float startTime, float duration, int date) {
         super(name, type, date, startTime, duration);
+        linkedTo = null;
+    }
+
+    public void linkTo(AntiTask a) {
+        linkedTo = a;
+    }
+
+    public void removeLinkedTo() {
+        linkedTo = null;
+    }
+
+    public boolean isLinkedTo() {
+        return linkedTo != null;
     }
 
     /**
