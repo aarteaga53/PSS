@@ -119,14 +119,16 @@ public class RecurringTask extends Task implements Cloneable {
         else if(month == 2) {
             if(year % 4 == 0) {
                 if(year % 100 == 0) {
-                    if(year % 400 == 0 && day > 29)
+                    if(year % 400 == 0 && day > 29){
                         day -= 29;
+                        month++;
+                    }
                 }
             }
-            else if(day > 28)
+            else if(day > 28){
                 day -= 28;
-
-            month++;
+                month++;
+            }
         }
         // else if(month == 2 && day > 28) {
         //     if(year % 4 == 0 && year % 100 == 0 && year % 400 == 0 && day > 29)
