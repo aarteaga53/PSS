@@ -60,6 +60,9 @@ public class RecurringTask extends Task implements Cloneable {
     
                     next = nextDate(next, frequency);
                 }
+                if(next > task.date && task.isAnti()) {
+                    return true;
+                }
             }
             else {
                 ArrayList<Integer> dates = new ArrayList<>();
@@ -136,13 +139,6 @@ public class RecurringTask extends Task implements Cloneable {
                 month++;
             }
         }
-        // else if(month == 2 && day > 28) {
-        //     if(year % 4 == 0 && year % 100 == 0 && year % 400 == 0 && day > 29)
-        //         day--;
-        
-        //     month++;
-        //     day -= 28;
-        // }
 
         return year * 10000 + month * 100 + day;
     }
