@@ -318,6 +318,9 @@ public class PSS {
      * @return
      */
     private boolean conflicts(Task newTask) {
+        if(tasks.size() == 0 && newTask.isAnti()) {
+            return true;
+        }
         for(Task task : tasks) {
             if(task.conflicts(newTask))
                 return true;
