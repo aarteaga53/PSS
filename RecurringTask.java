@@ -13,6 +13,11 @@ public class RecurringTask extends Task implements Cloneable {
         links = new ArrayList<>();
     }
 
+    /**
+     * Adds an anti task to links list, then that anti task 
+     * will have a link to this recurring task
+     * @param link
+     */
     public void addLink(AntiTask link) {
         links.add(link);
 
@@ -23,10 +28,25 @@ public class RecurringTask extends Task implements Cloneable {
         }
     }
 
+    /**
+     * Removes an anti task link, and any transient tasks
+     * that are linked to the anti task
+     * @param link
+     */
     public void removeLink(AntiTask link) {
+        for(TransientTask t : link.links) {
+            link.removeLink(t);
+        }
+
         links.remove(link);
     }
 
+    /**
+     * Checks if this recurring task has any anti tasks linked,
+     * transient tasks will be checked with any links if any
+     * @param link
+     * @return
+     */
     public boolean hasLink(Task link) {
         for(AntiTask a : links) {
             if((!a.conflicts(link) && a.date == link.date) && link.isTransient())
@@ -46,6 +66,7 @@ public class RecurringTask extends Task implements Cloneable {
             int next = date;
 
             if(!task.isRecurring()) {
+                //iterates through all days within the task time period and checks if there is any overlapping
                 while(next <= endDate && next <= task.date) {
                     if(next == task.date) {
                         if((task.isAnti() && (task.startTime == startTime && task.duration == duration)) && !hasLink(task)) {
@@ -60,11 +81,9 @@ public class RecurringTask extends Task implements Cloneable {
     
                     next = nextDate(next, frequency);
                 }
-                if(next > task.date && task.isAnti()) {
-                    return true;
-                }
             }
             else {
+                // gets all days within both recurring tasks and checks if there is any overlapping
                 ArrayList<Integer> dates = new ArrayList<>();
                 ArrayList<Integer> otherDates = new ArrayList<>();
                 RecurringTask r = (RecurringTask) task;
@@ -86,7 +105,10 @@ public class RecurringTask extends Task implements Cloneable {
                         return true;
                 }
             }
-            
+        }
+        else if(task.isAnti()) {
+            // if all days are iterated through and the task is anti then it does not cancel a recurring
+            return true;
         }
 
         return false;
@@ -156,7 +178,7 @@ public class RecurringTask extends Task implements Cloneable {
 
     @Override
     public RecurringTask clone() throws CloneNotSupportedException {
-        return (RecurringTask) super.clone();    // return shallow copy
+        return (RecurringTask) super.clone();
     }
 
 }

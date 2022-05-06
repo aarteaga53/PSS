@@ -72,6 +72,10 @@ public class Main {
         }
     }
 
+    /**
+     * Gets user input for pss action
+     * @return
+     */
     private static char getOption() {
         String option;
         String prompt = "\nChoose PSS action.\n" +
@@ -92,6 +96,10 @@ public class Main {
         return option.toLowerCase().charAt(0);
     }
 
+    /**
+     * Gets user input for login option
+     * @return
+     */
     private static char getStartOption() {
         String option;
 
@@ -106,6 +114,13 @@ public class Main {
         return option.toLowerCase().charAt(0);
     }
 
+    /**
+     * Checks if the input is valid within the given bound
+     * @param option
+     * @param lower
+     * @param upper
+     * @return
+     */
     private static boolean isOptionValid(String option, char lower, char upper) {
         if(option.length() != 1)
             return false;

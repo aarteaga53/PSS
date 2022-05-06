@@ -107,6 +107,11 @@ public class Task implements Comparable<Task> {
         return time;
     }
 
+    /**
+     * If the dates match, checks if there is overlap
+     * @param task
+     * @return
+     */
     public boolean conflicts(Task task) {
         if(task.date == date) {
             return overlaps(task);
@@ -115,6 +120,11 @@ public class Task implements Comparable<Task> {
         return false;
     }
 
+    /**
+     * Checks if the times overlap
+     * @param task
+     * @return
+     */
     public boolean overlaps(Task task) {
         if(task.startTime == startTime)
             return true;
