@@ -11,6 +11,11 @@ public class AntiTask extends Task implements Cloneable {
         linkedTo = null;
     }
 
+    /**
+     * Adds a transient task to links list, then that transient task
+     * will have a link to this anti task
+     * @param link
+     */
     public void addLink(TransientTask link) {
         links.add(link);
 
@@ -21,8 +26,13 @@ public class AntiTask extends Task implements Cloneable {
         }
     }
 
+    /**
+     * Removes a transient task link
+     * @param link
+     */
     public void removeLink(TransientTask link) {
         if (links.contains(link)) {
+            link.removeLinkedTo();
             links.remove(link);
         }
         else {
@@ -31,6 +41,11 @@ public class AntiTask extends Task implements Cloneable {
         }
     }
 
+    /**
+     * Checks if it has any transient task links
+     * @param link
+     * @return
+     */
     public boolean hasLink(Task link) {        
         for(TransientTask t : links) {
             if(t == link)
@@ -42,10 +57,17 @@ public class AntiTask extends Task implements Cloneable {
         return false;
     }
 
+    /**
+     * Links this anti task to the recurring task that it cancels
+     * @param r
+     */
     public void linkTo(RecurringTask r) {
         linkedTo = r;
     }
 
+    /**
+     * Checks if there any conflicts
+     */
     public boolean conflicts(Task task) {
         if(task.date == date && overlaps(task)) {
             if(task.isTransient() && !hasLink(task)) {
@@ -77,7 +99,7 @@ public class AntiTask extends Task implements Cloneable {
 
     @Override
     public AntiTask clone() throws CloneNotSupportedException {
-        return (AntiTask) super.clone();    // return shallow copy
+        return (AntiTask) super.clone();
     }
 
 }

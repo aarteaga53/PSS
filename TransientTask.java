@@ -7,14 +7,25 @@ public class TransientTask extends Task {
         linkedTo = null;
     }
 
+    /**
+     * Links this transient task to an anti task
+     * @param a
+     */
     public void linkTo(AntiTask a) {
         linkedTo = a;
     }
 
+    /**
+     * Removes a link to an anti task
+     */
     public void removeLinkedTo() {
         linkedTo = null;
     }
 
+    /**
+     * Checks if it is linked to an anti task
+     * @return
+     */
     public boolean isLinkedTo() {
         return linkedTo != null;
     }

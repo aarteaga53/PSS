@@ -80,12 +80,13 @@ public class PSS {
      * Gets user input for task type
      */
     private String chooseType() {
-        String prompt = "Choose task type:\n" +
-                        "\tClass - Recurring\n\tStudy - Recurring\n\tSleep - Recurring\n\tExercise - Recurring\n\tWork - Recurring\n\tMeal - Recurring\n" +
-                        "\tVisit - Transient\n\tShopping - Transient\n\tAppointment - Transient\n" +
-                        "\tCancellation - Anti\nEnter type: ";
+        String prompt = String.format("Choose task type:%n\t%12s - Recurring%n\t%12s - Recurring%n\t%12s - Recurring%n\t%12s - Recurring%n\t%12s - Recurring%n\t%12s - Recurring" +
+            "%n\t%12s - Transient%n\t%12s - Transient%n\t%12s - Transient%n\t%12s - Anti%nEnter type: ",
+         "Class", "Study", "Sleep", "Exercise", "Work", "Meal", "Visit", "Shopping", "Appointment", "Cancellation");
+
         String data = "Class,Study,Sleep,Exercise,Work,Meal,Visit,Shopping,Appointment,Cancellation";
         List<String> validTypes = Arrays.asList(data.split(","));
+        
         String option;
 
         boolean isInvalidType = true;
@@ -460,7 +461,7 @@ public class PSS {
         int year = 0;
 
         // length must be 10
-        if(date.length() < 10 || date.length() > 10) 
+        if(date.length() != 10) 
             return false;
 
         try {
