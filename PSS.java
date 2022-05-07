@@ -1,5 +1,5 @@
 import java.io.File;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.Collections;
 import java.util.Scanner;
 
@@ -45,15 +45,35 @@ public class PSS {
         }
         
         // checks what type of task is going to be created
-        if(new Task(type).isRecurring()) {
+        if(isTypeRecurring(type)) {
             createRecurring(name, type);
         }
-        else if(new Task(type).isTransient()) {
+        else if(isTypeTransient(type)) {
             createTransient(name, type);
         }
         else {
             createAnti(name, type);
         }
+    }
+
+    /** 
+     * checks if the task type is that of a recurring task.
+     * @return  True if the type is one of the recurring task types.
+     * */ 
+    private boolean isTypeRecurring(String type) {
+        return type.equals("Class") ||
+                type.equals("Study") || type.equals("Sleep") ||
+                type.equals("Sleep") || type.equals("Exercise") ||
+                type.equals("Work") || type.equals("Meal");
+    }
+
+    /** 
+     * checks if the task type is that of a transient task.
+     * @return  True if the type is one of the transient task types.
+     * */ 
+    private boolean isTypeTransient(String type) {
+        return type.equals("Visit") || 
+                type.equals("Shopping") || type.equals("Appointment");
     }
 
     /**
@@ -64,18 +84,19 @@ public class PSS {
                         "\tClass - Recurring\n\tStudy - Recurring\n\tSleep - Recurring\n\tExercise - Recurring\n\tWork - Recurring\n\tMeal - Recurring\n" +
                         "\tVisit - Transient\n\tShopping - Transient\n\tAppointment - Transient\n" +
                         "\tCancellation - Anti\nEnter type: ";
+        String data = "Class,Study,Sleep,Exercise,Work,Meal,Visit,Shopping,Appointment,Cancellation";
+        List<String> validTypes = Arrays.asList(data.split(","));
         String option;
-        Task newTask;
 
+        boolean isInvalidType = true;
         // Gets user input for task type
         do {
             System.out.print(prompt);
             option = kb.nextLine();
-            newTask = new Task(option);
-
-            if(!newTask.isRecurring() && !newTask.isTransient() && !newTask.isAnti())
+            isInvalidType =  validTypes.contains(option) == false;
+            if(isInvalidType)
                 System.out.println("\nInvalid input.\n");
-        } while(!newTask.isRecurring() && !newTask.isTransient() && !newTask.isAnti());
+        } while(isInvalidType);
 
         return option;
     }
@@ -552,14 +573,16 @@ public class PSS {
      * @param name
      */
     public void viewTask(String name) {
+        boolean taskFound = false;
         for(Task task : tasks) {
             if(task.name.equals(name)) {
                 System.out.println("\n" + task.toString());
-                return;
+                taskFound = true;
             }
         }
-
-        System.out.println("\nTask not found.");
+        if (taskFound == false) {
+            System.out.println("\nTask not found.");
+        }
     }
 
     /**
@@ -567,6 +590,8 @@ public class PSS {
      * @param name
      */
     public void deleteTask(String name) {
+        boolean taskFound = false;
+        List<Task> candidatesForDeletion = new ArrayList<Task>();
         for(Task task : tasks)
             if(task.name.equals(name)) {
                 if(task.isAnti()) {
@@ -595,15 +620,34 @@ public class PSS {
                     TransientTask temp = (TransientTask) task;
                     AntiTask link = temp.linkedTo;
 
-                    link.removeLink(temp);
+                    if (link != null) {
+                        link.removeLink(temp);
+                    }
                 }
 
-                tasks.remove(task);
-                System.out.println("\nTask deleted.");
-                return;
+                candidatesForDeletion.add(task);
+                taskFound = true;
             }
 
-        System.out.println("\nTask not found.");
+        if (taskFound == false) {
+            System.out.println("\nTask not found.");
+        }
+        else {
+            if (candidatesForDeletion.size() > 1) {
+                viewTask(name); // should print multiple tasks with the same name.
+                System.out.println("\nAbove are the tasks with that name.");
+                int date = inputDate("Input the date of the task you want deleted (mm/dd/yyyy): ");
+                for (Task task: candidatesForDeletion) {
+                    if (task.date == date) {
+                        tasks.remove(task);
+                    }
+                }
+            }
+            else {
+                tasks.remove(candidatesForDeletion.get(0));
+            }
+                System.out.println("\nTask deleted.");
+        }
     }
 
     /**
@@ -621,10 +665,11 @@ public class PSS {
     }
 
     /**
-     * Gets user input for filename and writes it to a file
+     * Gets user input for filename and writes the specified schedule to a file
      * @param username
+     * @param schedule  The schedule that is to be written to a file.
      */
-    public void writeSchedule(String username) {
+    public void writeSchedule(String username, List<Task> schedule) {
         String filepath = username + "/";
         String filename;
 
@@ -643,11 +688,19 @@ public class PSS {
             
             // asks to overwrite if the file exists
             if(kb.nextLine().toLowerCase().charAt(0) == 'y')
-                dataFile.write(tasks, filepath + filename);
+                dataFile.write(schedule, filepath + filename);
         }
         else {
-            dataFile.write(tasks, filepath + filename);
+            dataFile.write(schedule, filepath + filename);
         }
+    }
+
+    /**
+     * Gets user input for filename and writes the user's entire schedule to a file
+     * @param   username    The user who is writing their schedule to a file
+     */
+    public void writeSchedule(String username) {
+        writeSchedule(username, tasks);
     }
 
     /**
@@ -700,8 +753,6 @@ public class PSS {
         int date = dateConversion(startDate);
         ArrayList<Task> tasksInDay = getTasksInPeriod(date, 1);
 
-        Collections.sort(tasksInDay);
-
         for (Task task : tasksInDay) {
             System.out.println("\n" + task.toString());
         }
@@ -730,8 +781,6 @@ public class PSS {
 
         int date = dateConversion(startDate);
         ArrayList<Task> tasksInWeek = getTasksInPeriod(date, 7);
-
-        Collections.sort(tasksInWeek);
 
         for (Task task : tasksInWeek) {
             System.out.println("\n" + task.toString());
@@ -762,11 +811,50 @@ public class PSS {
         int date = dateConversion(startDate);
         ArrayList<Task> tasksInMonth = getTasksInPeriod(date, 30);
 
-        Collections.sort(tasksInMonth);
-
         for (Task task : tasksInMonth) {
             System.out.println("\n" + task.toString());
         }
+    }
+
+    public void writeDaySchedule(String username) {
+        int durationInDays = 1;
+        int date = inputDate("Input the date (mm/dd/yyyy): ");
+        ArrayList<Task> tasksInWeek = getTasksInPeriod(date, durationInDays);
+        writeSchedule(username, tasksInWeek);
+    }
+    public void writeWeekSchedule(String username) {
+        int durationInDays = 7;
+        int date = inputDate("Input the first date of the week (mm/dd/yyyy): ");
+        ArrayList<Task> tasksInWeek = getTasksInPeriod(date, durationInDays);
+        writeSchedule(username, tasksInWeek);
+    }
+    public void writeMonthSchedule(String username) {
+        int durationInDays = 30;
+        int date = inputDate("Input the first date of the month (mm/dd/yyyy): ");
+        ArrayList<Task> tasksInWeek = getTasksInPeriod(date, durationInDays);
+        writeSchedule(username, tasksInWeek);
+    }
+
+
+    public int inputDate(String prompt) {
+        String startDate;
+        int count = 0;
+        // gets user input for start date
+        do {
+            System.out.print(prompt);
+            startDate = kb.nextLine();
+
+            if(!isDateCorrect(startDate))
+                count++;
+        } while(!isDateCorrect(startDate) && count < 3);
+
+        if(count == 3) {
+            System.out.println("\nToo many attempts.");
+            return -1;
+        }
+        int date = dateConversion(startDate);
+
+        return date;
     }
 
     /**
@@ -791,6 +879,8 @@ public class PSS {
             day.endDate = next;
             count++;
         }
+
+        Collections.sort(tasksInPeriod);
 
         return tasksInPeriod;
     }

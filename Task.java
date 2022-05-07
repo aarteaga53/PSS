@@ -23,7 +23,17 @@ public class Task implements Comparable<Task> {
      * @return
      */
     public boolean isAnti() {
-        return type.equals("Cancellation");
+        // tries to access an attribute only Anti tasks have.
+        // if an exception is thrown, then it could be that the task
+        // is not a Anti task.
+        boolean isAnti = false;
+        try {
+            AntiTask testTask = (AntiTask) this;
+            testTask.links = testTask.links;
+            isAnti = true;
+        }
+        catch (Exception x) {}
+        return isAnti;
     }
 
     /**
@@ -31,8 +41,26 @@ public class Task implements Comparable<Task> {
      * @return
      */
     public boolean isTransient() {
-        return type.equals("Visit") || 
-                type.equals("Shopping") || type.equals("Appointment");
+        // tries to access a recurring task attribute and an anti task
+        // attribute. If it fails both accesses, then it might be a
+        // transient task
+        boolean isRecurring = false;
+        try {
+            RecurringTask testTask = (RecurringTask) this;
+            testTask.endDate = testTask.endDate;
+            isRecurring = true;
+        }
+        catch (Exception x) {}
+        boolean isAnti = false;
+        try {
+            AntiTask testTask = (AntiTask) this;
+            testTask.links = testTask.links;
+            isAnti = true;
+        }
+        catch (Exception x) {}
+
+        boolean isTransient = (isRecurring == false && isAnti == false);
+        return isTransient;
     }
 
     /**
@@ -40,10 +68,17 @@ public class Task implements Comparable<Task> {
      * @return
      */
     public boolean isRecurring() {
-        return type.equals("Class") ||
-                type.equals("Study") || type.equals("Sleep") ||
-                type.equals("Sleep") || type.equals("Exercise") ||
-                type.equals("Work") || type.equals("Meal");
+        // tries to access an attribute only recurring tasks have.
+        // if an exception is thrown, then it could be that the task
+        // is not a recurring task.
+        boolean isRecurring = false;
+        try {
+            RecurringTask testTask = (RecurringTask) this;
+            testTask.endDate = testTask.endDate;
+            isRecurring = true;
+        }
+        catch (Exception x) {}
+        return isRecurring;
     }
 
     /**

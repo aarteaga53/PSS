@@ -62,9 +62,18 @@ public class Main {
                         pss.monthSchedule();
                         break;
                     case'j':
-                        user = new User();
+                        pss.writeDaySchedule(user.username);
                         break;
                     case'k':
+                        pss.writeWeekSchedule(user.username);
+                        break;
+                    case'l':
+                        pss.writeMonthSchedule(user.username); 
+                        break;
+                    case'm':
+                        user = new User();
+                        break;
+                    case'n':
                         run = false;
                         break;
                 }
@@ -79,15 +88,17 @@ public class Main {
             "\tc) Delete a task\n\td) Edit a task\n" +
             "\te) Write schedule to a file\n\tf) Read schedule from a file\n" +
             "\tg) View schedule for a day\n\th) View schedule for a week\n" +
-            "\ti) View schedule for a month\n\tj) Logout\n\tk) Exit\nEnter option: ";
+            "\ti) View schedule for a month\n\tj) Write schedule for a day\n" +
+            "\tk) Write schedule for a week\n\tl) Write schedule for a month\n" +
+            "\tm) Logout\n\tn) Exit\nEnter option: ";
 
         do {
             System.out.print(prompt);
             option = kb.nextLine();
 
-            if(!isOptionValid(option, 'a', 'k'))
+            if(!isOptionValid(option, 'a', 'n'))
                 System.out.println("\nInvalid input.\n");
-        } while(!isOptionValid(option, 'a', 'k'));
+        } while(!isOptionValid(option, 'a', 'n'));
 
         return option.toLowerCase().charAt(0);
     }

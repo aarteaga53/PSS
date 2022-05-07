@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class DataFile {
@@ -9,20 +10,20 @@ public class DataFile {
     /**
      * Writes tasks to a file
      * @param filename
-     * @param tasks
+     * @param schedule
      */
-    public void write(ArrayList<Task> tasks, String filename) {
+    public void write(List<Task> schedule, String filename) {
         try {
             File file = new File(filename);
             FileWriter fw = new FileWriter(file);
             String text = "[\n";
 
             // converts every task to json format
-            for(int i = 0; i < tasks.size(); i++) {
-                text += tasks.get(i).convertJSON();
+            for(int i = 0; i < schedule.size(); i++) {
+                text += schedule.get(i).convertJSON();
 
                 // if it is not the last task, add comma
-                if(i != tasks.size() - 1)
+                if(i != schedule.size() - 1)
                     text += ",\n";
             }
 
@@ -39,7 +40,7 @@ public class DataFile {
      * @param filename
      */
     public void read(ArrayList<Task> tasks, String filename) {
-        ArrayList<Task> newTasks = new ArrayList<>();
+        ArrayList<Task> newTasks = new ArrayList<>(); // this variable may need to be removed because I don't think it is used.
         String name = "";
         String type = "";
         int date = 0;
@@ -62,7 +63,7 @@ public class DataFile {
                 if(line.equals("\t},") || line.equals("\t}")) {
                     Task newTask = new Task(type);
 
-                    if(newTask.isRecurring()) {
+                    if(newTask.isRecurring()) { // can replace with "if type is recurring type"
                         newTask = new RecurringTask(name, type, startTime, duration, date, endDate, frequency);
                         newTasks.add(newTask);
                     }  
@@ -79,7 +80,7 @@ public class DataFile {
 
                     // checks that there is no conflicts with tasks
                     for(i = 0; i < tasks.size(); i++) {
-                        if(tasks.get(i).name.equals(newTask.name) || tasks.get(i).conflicts(newTask))
+                        if(tasks.get(i).conflicts(newTask))
                             break;
                     }
 

@@ -22,7 +22,13 @@ public class AntiTask extends Task implements Cloneable {
     }
 
     public void removeLink(TransientTask link) {
-        links.remove(link);
+        if (links.contains(link)) {
+            links.remove(link);
+        }
+        else {
+            System.out.println("Warning: AntiTask's remove link tried" +
+                                " to remove a link that wasn't in the list");
+        }
     }
 
     public boolean hasLink(Task link) {        
