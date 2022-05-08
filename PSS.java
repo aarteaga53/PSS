@@ -94,7 +94,8 @@ public class PSS {
         do {
             System.out.print(prompt);
             option = kb.nextLine();
-            isInvalidType =  validTypes.contains(option) == false;
+            isInvalidType = validTypes.contains(option) == false;
+
             if(isInvalidType)
                 System.out.println("\nInvalid input.\n");
         } while(isInvalidType);
@@ -820,8 +821,8 @@ public class PSS {
     public void writeDaySchedule(String username) {
         int durationInDays = 1;
         int date = inputDate("Input the date (mm/dd/yyyy): ");
-        ArrayList<Task> tasksInWeek = getTasksInPeriod(date, durationInDays);
-        writeSchedule(username, tasksInWeek);
+        ArrayList<Task> tasksInDay = getTasksInPeriod(date, durationInDays);
+        writeSchedule(username, tasksInDay);
     }
     public void writeWeekSchedule(String username) {
         int durationInDays = 7;
@@ -832,14 +833,15 @@ public class PSS {
     public void writeMonthSchedule(String username) {
         int durationInDays = 30;
         int date = inputDate("Input the first date of the month (mm/dd/yyyy): ");
-        ArrayList<Task> tasksInWeek = getTasksInPeriod(date, durationInDays);
-        writeSchedule(username, tasksInWeek);
+        ArrayList<Task> tasksInMonth = getTasksInPeriod(date, durationInDays);
+        writeSchedule(username, tasksInMonth);
     }
 
 
     public int inputDate(String prompt) {
         String startDate;
         int count = 0;
+
         // gets user input for start date
         do {
             System.out.print(prompt);

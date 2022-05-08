@@ -40,7 +40,6 @@ public class DataFile {
      * @param filename
      */
     public void read(ArrayList<Task> tasks, String filename) {
-        ArrayList<Task> newTasks = new ArrayList<>(); // this variable may need to be removed because I don't think it is used.
         String name = "";
         String type = "";
         int date = 0;
@@ -65,15 +64,12 @@ public class DataFile {
 
                     if(newTask.isRecurring()) { // can replace with "if type is recurring type"
                         newTask = new RecurringTask(name, type, startTime, duration, date, endDate, frequency);
-                        newTasks.add(newTask);
                     }  
                     else if(newTask.isTransient()) {
                         newTask = new TransientTask(name, type, startTime, duration, date);
-                        newTasks.add(newTask);
                     }
                     else {
                         newTask = new AntiTask(name, type, startTime, duration, date);
-                        newTasks.add(newTask);
                     }
 
                     int i;
@@ -92,24 +88,30 @@ public class DataFile {
                     String[] split = line.split(" : ");
 
                     // checks key and reads the value
-                    if(split[0].equals("\t\t\"Name\""))
+                    if(split[0].equals("\t\t\"Name\"")) {
                         name = split[1].substring(split[1].indexOf("\"") + 1, split[1].lastIndexOf("\""));
-                    else if(split[0].equals("\t\t\"Type\""))
+                    }
+                    else if(split[0].equals("\t\t\"Type\"")) {
                         type = split[1].substring(split[1].indexOf("\"") + 1, split[1].lastIndexOf("\""));
-                    else if(split[0].equals("\t\t\"StartDate\"") || split[0].equals("\t\t\"Date\""))
+                    }
+                    else if(split[0].equals("\t\t\"StartDate\"") || split[0].equals("\t\t\"Date\"")) {
                         date = Integer.parseInt(split[1].substring(0, split[1].indexOf(",")));
-                    else if(split[0].equals("\t\t\"StartTime\""))
+                    }
+                    else if(split[0].equals("\t\t\"StartTime\"")) {
                         startTime = Float.parseFloat(split[1].substring(0, split[1].indexOf(",")));
+                    }
                     else if(split[0].equals("\t\t\"Duration\"")) {
                         if(split[1].indexOf(",") < 0)
                             duration = Float.parseFloat(split[1]);
                         else
                             duration = Float.parseFloat(split[1].substring(0, split[1].indexOf(",")));
                     }  
-                    else if(split[0].equals("\t\t\"EndDate\""))
+                    else if(split[0].equals("\t\t\"EndDate\"")) {
                         endDate = Integer.parseInt(split[1].substring(0, split[1].indexOf(",")));
-                    else if(split[0].equals("\t\t\"Frequency\""))
+                    }
+                    else if(split[0].equals("\t\t\"Frequency\"")) {
                         frequency = Integer.parseInt(split[1]);
+                    }
                 }
             }
 
