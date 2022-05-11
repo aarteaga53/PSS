@@ -15,6 +15,67 @@ public class PSS {
     }
 
     /**
+     * Upon logging in the user is asked if they would like to load a file
+     * that is already in their account, if they have any
+     * @param username
+     */
+    public void loadSchedule(String username) {
+        String[] schedules = dataFile.readSchedules(username);
+        String option;
+        int count = 0;
+
+        if(schedules.length > 0) {
+            System.out.println("\nWould you like to load a schedule?");
+            for(int i = 0; i < schedules.length; i++) {
+                System.out.println("\t" + (i + 1) + ") " + schedules[i]);
+            }
+
+            System.out.println("\t" + (schedules.length + 1) + ") No");
+
+            do {
+                System.out.print("Enter option: ");
+                option = kb.nextLine();
+                count++;
+
+                if(count == 3) {
+                    System.out.println("\nToo many attempts, no schedule was loaded.");
+                    return;
+                }
+            } while(!isValid(1, schedules.length + 1, option));
+            
+            int num = Integer.parseInt(option);
+
+            if(num <= schedules.length) {
+                String filename = username + "/" + schedules[num-1];
+                dataFile.read(tasks, filename);
+            }
+        }
+    }
+
+    /**
+     * Checks if the option for loadSchedule() is a valid input
+     * @param lower
+     * @param upper
+     * @param input
+     * @return
+     */
+    private boolean isValid(int lower, int upper, String input) {
+        int num;
+
+        try {
+            num = Integer.parseInt(input);
+        } catch(NumberFormatException e) {
+            return false;
+        }
+
+        if(num >= lower && num <= upper) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Creates a task based on type
      */
     public void createTask() {

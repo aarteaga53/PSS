@@ -121,4 +121,21 @@ public class DataFile {
         }
     }
 
+    /**
+     * Reads all files/schedules that are in the account,
+     * and returns the names of all files
+     * @param username
+     * @return
+     */
+    public String[] readSchedules(String username) {
+        File[] files = new File(username).listFiles();
+        String[] schedules = new String[files.length];
+
+        for(int i = 0; i < files.length; i++) {
+            schedules[i] = files[i].getName();
+        }
+
+        return schedules;
+    }
+
 }

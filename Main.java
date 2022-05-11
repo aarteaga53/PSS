@@ -27,6 +27,10 @@ public class Main {
                 }
             }
 
+            if(user.username != null && run) {
+                pss.loadSchedule(user.username);
+            }
+
             while(user.username != null && run) {
                 option = getOption();    
 
@@ -71,6 +75,7 @@ public class Main {
                         pss.writeMonthSchedule(user.username); 
                         break;
                     case'm':
+                        pss = new PSS();
                         user = new User();
                         break;
                     case'n':
