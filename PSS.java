@@ -73,11 +73,11 @@ public class PSS {
                         "\n\t1) Yes" +
                         "\n\t2) No";
 
-        System.out.println(menu);
-
         // remember to set isSaved to false when changes have been made
         // and true when they have been saved
         if(isSaved == false) {
+            System.out.println(menu);
+
             do {
                 System.out.print("Enter option: ");
                 option = kb.nextLine();
@@ -210,6 +210,10 @@ public class PSS {
         return option;
     }
 
+    /**
+     * Gets user input for the start time of the task
+     * @return
+     */
     private String getStartTimeInput() {
         String startTime;
         int count = 0;
@@ -229,6 +233,10 @@ public class PSS {
         return startTime;
     }
 
+    /**
+     * Gets user input for the duration of the task
+     * @return
+     */
     private String getDurationInput() {
         String duration;
         int count = 0;
@@ -249,7 +257,7 @@ public class PSS {
     }
 
     /**
-     * Gets user input for start date of tasks for view/write day/week/month
+     * Gets user input for start date of a task
      * @return
      */
     private String getDateInput(String prompt) {
@@ -271,6 +279,11 @@ public class PSS {
         return startDate;
     }
 
+    /**
+     * Gets user input for the end date of the task
+     * @param startDate
+     * @return
+     */
     private String getEndDateInput(String startDate) {
         String endDate;
         int count = 0;
@@ -290,6 +303,10 @@ public class PSS {
         return endDate;
     }
 
+    /**
+     * Gets user input for the frequency of the task
+     * @return
+     */
     private String getFrequencyInput() {
         String frequency;
         int count = 0;
@@ -315,7 +332,6 @@ public class PSS {
      * @param type      
      */
     private void createAnti(String name, String type) {
-        AntiTask newTask;
         String startTime = getStartTimeInput();
 
         if(startTime.equals("")) {
@@ -334,7 +350,7 @@ public class PSS {
             return;
         }
 
-        newTask = new AntiTask(name, type, timeConversion(startTime), durationConversion(duration), dateConversion(date));
+        AntiTask newTask = new AntiTask(name, type, timeConversion(startTime), durationConversion(duration), dateConversion(date));
 
         if(conflicts(newTask)) {
             System.out.println("\nAnti Task does not cancel a recurring task.");
@@ -352,7 +368,6 @@ public class PSS {
      * @param type
      */
     private void createTransient(String name, String type) {
-        TransientTask newTask;
         String startTime = getStartTimeInput();
 
         if(startTime.equals("")) {
@@ -371,7 +386,7 @@ public class PSS {
             return;
         }
 
-        newTask = new TransientTask(name, type, timeConversion(startTime), durationConversion(duration), dateConversion(date));
+        TransientTask newTask = new TransientTask(name, type, timeConversion(startTime), durationConversion(duration), dateConversion(date));
 
         if(conflicts(newTask)) {
             System.out.println("\nThis task conflicts with an existing task.");
@@ -388,8 +403,6 @@ public class PSS {
      * @param type
      */
     private void createRecurring(String name, String type) {
-        RecurringTask newTask;
-
         String startTime = getStartTimeInput();
 
         if(startTime.equals("")) {
@@ -420,7 +433,7 @@ public class PSS {
             return;
         }
 
-        newTask = new RecurringTask(name, type, timeConversion(startTime), durationConversion(duration), dateConversion(startDate), dateConversion(endDate), Integer.parseInt(frequency));
+        RecurringTask newTask = new RecurringTask(name, type, timeConversion(startTime), durationConversion(duration), dateConversion(startDate), dateConversion(endDate), Integer.parseInt(frequency));
 
         if(conflicts(newTask)) {
             System.out.println("\nThis task conflicts with an existing task.");

@@ -110,7 +110,7 @@ public class Main {
             option = kb.nextLine();
 
             if(!isOptionValid(option, 'a', 'n'))
-                System.out.println("\nInvalid input.\n");
+                System.out.println("\nInvalid input.");
         } while(!isOptionValid(option, 'a', 'n'));
 
         return option.toLowerCase().charAt(0);
