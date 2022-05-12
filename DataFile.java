@@ -76,8 +76,9 @@ public class DataFile {
 
                     // checks that there is no conflicts with tasks
                     for(i = 0; i < tasks.size(); i++) {
-                        if(tasks.get(i).conflicts(newTask))
+                        if(tasks.get(i).conflicts(newTask) || tasks.get(i).name.equals(newTask.name)) {
                             break;
+                        }
                     }
 
                     // adds a new task if it is not a repeat

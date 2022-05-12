@@ -28,11 +28,13 @@ public class User {
             System.out.print("Enter username: ");
             newUsername = kb.nextLine();
 
-            if(newUsername.length() <= 1)
+            if(newUsername.length() <= 1) {
                 System.out.println("\nUsername is too short.\n");
+            }
 
-            if(users.containsKey(newUsername))
+            if(users.containsKey(newUsername)) {
                 System.out.println("\nUsername already exists.\n");
+            }
         } while(users.containsKey(newUsername) || newUsername.length() <= 1);
 
         // gets password that is longer than 1 character
@@ -40,8 +42,9 @@ public class User {
             System.out.print("Enter password: ");
             newPassword = kb.nextLine();
 
-            if(newPassword.length() <= 1)
+            if(newPassword.length() <= 1) {
                 System.out.println("\nPassword is too short.\n");
+            }
         } while(newPassword.length() <= 1);
         
 
@@ -65,11 +68,13 @@ public class User {
             newUsername = kb.nextLine();
             attempts++;
 
-            if(attempts == 3)
-                return;
-
-            if(!users.containsKey(newUsername))
+            if(!users.containsKey(newUsername)) {
                 System.out.println("\nUsername does not exist.\n");
+            }
+
+            if(attempts == 3) {
+                return;
+            }
         } while(!users.containsKey(newUsername));
 
         attempts = 0;
@@ -80,11 +85,13 @@ public class User {
             newPassword = kb.nextLine();
             attempts++;
 
-            if(attempts == 3)
-                return;
-
-            if(!users.get(newUsername).equals(newPassword))
+            if(!users.get(newUsername).equals(newPassword)) {
                 System.out.println("\nIncorrect password.\n");
+            }
+
+            if(attempts == 3) {
+                return;
+            }
         } while(!users.get(newUsername).equals(newPassword));
 
         username = newUsername;

@@ -34,12 +34,11 @@ public class PSS {
         int count = 0;
 
         if(schedules.length > 0) {
-            System.out.println("\nWould you like to load a schedule?");
+            System.out.println("\nWould you like to load a schedule?\n\t0) Continue");
+
             for(int i = 0; i < schedules.length; i++) {
                 System.out.println("\t" + (i + 1) + ") " + schedules[i]);
             }
-
-            System.out.println("\t" + (schedules.length + 1) + ") No");
 
             do {
                 System.out.print("Enter option: ");
@@ -50,11 +49,11 @@ public class PSS {
                     System.out.println("\nToo many attempts, no schedule was loaded.");
                     return;
                 }
-            } while(!isValid(1, schedules.length + 1, option));
+            } while(!isValid(0, schedules.length, option));
             
             int num = Integer.parseInt(option);
 
-            if(num <= schedules.length) {
+            if(num <= schedules.length && num != 0) {
                 String filename = username + "/" + schedules[num-1];
                 dataFile.read(tasks, filename);
             }
@@ -67,42 +66,35 @@ public class PSS {
      * @param username
      */
     public void exitWriteSchedule(String username) {
-        int option = -1;     
+        String option;
+        int count = 0;     
         String menu =   "\nYou have not saved your whole raw schedule to a file" +
                         "\nWould you like to save your whole schedule to a file?" +
-                        "\n\t(1) Yes" +
-                        "\n\t(2) No";
+                        "\n\t1) Yes" +
+                        "\n\t2) No";
+
+        System.out.println(menu);
+
         // remember to set isSaved to false when changes have been made
         // and true when they have been saved
         if(isSaved == false) {
             do {
-                System.out.println(menu);
-                option = inputOption(1, 2);
-            } while (option == -1); // repeat prompt if user had too many attempts
-            if (option == 1) {     // if the user chose to save to a file
+                System.out.print("Enter option: ");
+                option = kb.nextLine();
+                count++;
+
+                if(count == 3) {
+                    System.out.println("\nToo many attempts, file was not saved.");
+                    return;
+                }
+            } while (!isValid(1, 2, option)); // repeat prompt if user had too many attempts
+
+            int num = Integer.parseInt(option);
+
+            if(num == 1) {     // if the user chose to save to a file
                 writeSchedule(username);
             }
         }
-    }
-
-    private int inputOption(int firstValidOption, int lastValidOption) {
-        String input;       // The string the user inputs
-        int option = -1;    // The integer verson of the user's input
-        int count = 0;      // The number of attempts to enter the option
-        boolean isValid;    // Whether the option is a valid option
-        do {
-            System.out.print("Enter option: ");
-            input = kb.nextLine();
-            count++;
-
-            if(count == 3) {
-                System.out.println("\nToo many attempts");
-                return -1;
-            }
-            option = Integer.parseInt(input);
-            isValid = (firstValidOption <= option && option <= lastValidOption);
-        } while(!isValid);
-        return option;
     }
 
     /**
@@ -218,6 +210,105 @@ public class PSS {
         return option;
     }
 
+    private String getStartTimeInput() {
+        String startTime;
+        int count = 0;
+
+        // gets user input for start time
+        do {
+            System.out.print("Enter task start time(hh:mm am/pm): ");
+            startTime = kb.nextLine();
+            count++;
+
+            if(count == 3) {
+                System.out.println("\nToo many attempts.");
+                return "";
+            }
+        } while(!isStartTimeCorrect(startTime) && count < 3);
+
+        return startTime;
+    }
+
+    private String getDurationInput() {
+        String duration;
+        int count = 0;
+
+        // gets user input for duration
+        do {
+            System.out.print("Enter task duration(hh:mm): ");
+            duration = kb.nextLine();
+            count++;
+
+            if(count == 3) {
+                System.out.println("\nToo many attempts.");
+                return "";
+            }
+        } while(!isDurationCorrect(duration));
+
+        return duration;
+    }
+
+    /**
+     * Gets user input for start date of tasks for view/write day/week/month
+     * @return
+     */
+    private String getDateInput(String prompt) {
+        String startDate;
+        int count = 0;
+
+        // gets user input for start date
+        do {
+            System.out.print(prompt);
+            startDate = kb.nextLine();
+            count++;
+
+            if(count == 3) {
+                System.out.println("\nToo many attempts.");
+                return "";
+            }
+        } while(!isDateCorrect(startDate));
+
+        return startDate;
+    }
+
+    private String getEndDateInput(String startDate) {
+        String endDate;
+        int count = 0;
+
+        // gets user input for end date
+        do {
+            System.out.print("Enter task end date(mm/dd/yyyy): ");
+            endDate = kb.nextLine();
+            count++;
+
+            if(count == 3) {
+                System.out.println("\nToo many attempts.");
+                return "";
+            }
+        } while(!isEndDateCorrect(startDate, endDate));
+
+        return endDate;
+    }
+
+    private String getFrequencyInput() {
+        String frequency;
+        int count = 0;
+
+        // gets user input for frequency
+        do {
+            System.out.print("Enter task frequency(1/7): ");
+            frequency = kb.nextLine();
+            count++;
+
+            if(count == 3) {
+                System.out.println("\nToo many attempts.");
+                return "";
+            }
+        } while(!isFrequencyCorrect(frequency));
+
+        return frequency;
+    }
+
     /**
      * Creates an Anti-Task
      * @param name      
@@ -225,61 +316,29 @@ public class PSS {
      */
     private void createAnti(String name, String type) {
         AntiTask newTask;
-        String startTime;
-        String duration;
-        String date;
-        int count = 0;
+        String startTime = getStartTimeInput();
 
-        // gets user input for start time
-        do {
-            System.out.print("Enter task start time(hh:mm am/pm): ");
-            startTime = kb.nextLine();
-
-            if(!isStartTimeCorrect(startTime))
-                count++;
-        } while(!isStartTimeCorrect(startTime) && count < 3);
-
-        if(count == 3) {
-            System.out.println("\nToo many attempts.");
+        if(startTime.equals("")) {
             return;
         }
-        else
-            count = 0;
 
-        // gets user input for duration
-        do {
-            System.out.print("Enter task duration(hh:mm): ");
-            duration = kb.nextLine();
+        String duration = getDurationInput();
 
-            if(!isDurationCorrect(duration))
-                count++;
-        } while(!isDurationCorrect(duration) && count < 3);
-
-        if(count == 3) {
-            System.out.println("\nToo many attempts.");
-            count++;
+        if(duration.equals("")) {
+            return;
         }
-        else
-            count = 0;
 
-        // gets user input for date
-        do {
-            System.out.print("Enter task date(mm/dd/yyyy): ");
-            date = kb.nextLine();
+        String date = getDateInput("Enter task date(mm/dd/yyyy): ");
 
-            if(!isDateCorrect(date))
-                count++;
-        } while(!isDateCorrect(date) && count < 3);
-
-        if(count == 3) {
-            System.out.println("\nToo many attempts.");
-            count++;
+        if(date.equals("")) {
+            return;
         }
 
         newTask = new AntiTask(name, type, timeConversion(startTime), durationConversion(duration), dateConversion(date));
 
-        if(conflicts(newTask))
+        if(conflicts(newTask)) {
             System.out.println("\nAnti Task does not cancel a recurring task.");
+        }
         else {
             tasks.add(newTask);
             isSaved = false;
@@ -294,64 +353,33 @@ public class PSS {
      */
     private void createTransient(String name, String type) {
         TransientTask newTask;
-        String startTime;
-        String duration;
-        String date;
-        int count = 0;
+        String startTime = getStartTimeInput();
 
-        // gets user input for start time
-        do {
-            System.out.print("Enter task start time(hh:mm am/pm): ");
-            startTime = kb.nextLine();
-
-            if(!isStartTimeCorrect(startTime))
-                count++;
-        } while(!isStartTimeCorrect(startTime) && count < 3);
-
-        if(count == 3) {
-            System.out.println("\nToo many attempts.");
+        if(startTime.equals("")) {
             return;
         }
-        else
-            count = 0;
 
-        // gets user input for duration
-        do {
-            System.out.print("Enter task duration(hh:mm): ");
-            duration = kb.nextLine();
+        String duration = getDurationInput();
 
-            if(!isDurationCorrect(duration))
-                count++;
-        } while(!isDurationCorrect(duration) && count < 3);
-
-        if(count == 3) {
-            System.out.println("\nToo many attempts.");
-            count++;
+        if(duration.equals("")) {
+            return;
         }
-        else
-            count = 0;
 
-        // gets user input for date
-        do {
-            System.out.print("Enter task date(mm/dd/yyyy): ");
-            date = kb.nextLine();
+        String date = getDateInput("Enter task date(mm/dd/yyyy): ");
 
-            if(!isDateCorrect(date))
-                count++;
-        } while(!isDateCorrect(date) && count < 3);
-
-        if(count == 3) {
-            System.out.println("\nToo many attempts.");
-            count++;
+        if(date.equals("")) {
+            return;
         }
 
         newTask = new TransientTask(name, type, timeConversion(startTime), durationConversion(duration), dateConversion(date));
 
-        if(conflicts(newTask))
+        if(conflicts(newTask)) {
             System.out.println("\nThis task conflicts with an existing task.");
-        else
+        }
+        else {
             tasks.add(newTask);
             isSaved = false;
+        } 
     }
 
     /**
@@ -361,98 +389,46 @@ public class PSS {
      */
     private void createRecurring(String name, String type) {
         RecurringTask newTask;
-        String startTime;
-        String duration;
-        String startDate;
-        String endDate;
-        String frequency;
-        int count = 0;
 
-        // gets user input for start time
-        do {
-            System.out.print("Enter task start time(hh:mm am/pm): ");
-            startTime = kb.nextLine();
+        String startTime = getStartTimeInput();
 
-            if(!isStartTimeCorrect(startTime))
-                count++;
-        } while(!isStartTimeCorrect(startTime) && count < 3);
-
-        if(count == 3) {
-            System.out.println("\nToo many attempts.");
+        if(startTime.equals("")) {
             return;
         }
-        else
-            count = 0;
 
-        // gets user input for duration
-        do {
-            System.out.print("Enter task duration(hh:mm): ");
-            duration = kb.nextLine();
+        String duration = getDurationInput();
 
-            if(!isDurationCorrect(duration))
-                count++;
-        } while(!isDurationCorrect(duration) && count < 3);
-
-        if(count == 3) {
-            System.out.println("\nToo many attempts.");
+        if(duration.equals("")) {
             return;
         }
-        else
-            count = 0;
 
-        // gets user input for start date
-        do {
-            System.out.print("Enter task start date(mm/dd/yyyy): ");
-            startDate = kb.nextLine();
+        String startDate = getDateInput("Enter task start date(mm/dd/yyyy): ");
 
-            if(!isDateCorrect(startDate))
-                count++;
-        } while(!isDateCorrect(startDate) && count < 3);
-
-        if(count == 3) {
-            System.out.println("\nToo many attempts.");
+        if(startDate.equals("")) {
             return;
         }
-        else
-            count = 0;
             
-        // gets user input for end date
-        do {
-            System.out.print("Enter task end date(mm/dd/yyyy): ");
-            endDate = kb.nextLine();
+        String endDate = getEndDateInput(startDate);
 
-            if(!isEndDateCorrect(startDate, endDate))
-                count++;
-        } while(!isEndDateCorrect(startDate, endDate) && count < 3);
-
-        if(count == 3) {
-            System.out.println("\nToo many attempts.");
+        if(endDate.equals("")) {
             return;
         }
-        else
-            count = 0;
 
-        // gets user input for frequency
-        do {
-            System.out.print("Enter task frequency(1/7): ");
-            frequency = kb.nextLine();
+        String frequency = getFrequencyInput();
 
-            if(!isFrequencyCorrect(frequency))
-                count++;
-        } while(!isFrequencyCorrect(frequency) && count < 3);
-
-        if(count == 3) {
-            System.out.println("\nToo many attempts.");
+        if(frequency.equals("")) {
             return;
         }
 
         newTask = new RecurringTask(name, type, timeConversion(startTime), durationConversion(duration), dateConversion(startDate), dateConversion(endDate), Integer.parseInt(frequency));
 
-        if(conflicts(newTask))
+        if(conflicts(newTask)) {
             System.out.println("\nThis task conflicts with an existing task.");
-        else
+        }
+        else {
             tasks.add(newTask);
             isSaved = false;
+        }  
     }
 
     /**
@@ -475,6 +451,7 @@ public class PSS {
             }
         }
 
+        // if no recurring tasks were found then anti cannot be created
         if(newTask.isAnti() && !recurringPresent) {
             return true;
         }
@@ -501,7 +478,7 @@ public class PSS {
      * @return
      */
     private boolean isFrequencyCorrect(String frequency) {
-        int f = 0;
+        int f;
 
         try {
             f = Integer.parseInt(frequency);
@@ -521,8 +498,8 @@ public class PSS {
      * @return
      */
     private boolean isDurationCorrect(String duration) {
-        int hour = 0;
-        int minute = 0;
+        int hour;
+        int minute;
 
         // length must be 4 or 5
         if(duration.length() > 5 || duration.length() < 4)
@@ -554,9 +531,9 @@ public class PSS {
      * @return
      */
     private boolean isStartTimeCorrect(String startTime) {
-        int hour = 0;
-        int minute = 0;
-        String time = "";
+        int hour;
+        int minute;
+        String time;
 
         // length must be 7 or 8
         if(startTime.length() > 8 || startTime.length() < 7)
@@ -587,9 +564,9 @@ public class PSS {
      * @return
      */
     private boolean isDateCorrect(String date) {
-        int month = 0;
-        int day = 0;
-        int year = 0;
+        int month;
+        int day;
+        int year;
 
         // length must be 10
         if(date.length() != 10) 
@@ -659,10 +636,12 @@ public class PSS {
         float hour = Float.parseFloat(t[0]);
         float minute = Float.parseFloat(t[1]);
 
-        if((t[2].equals("am") && hour != 12) || (t[2].equals("pm") && hour == 12))
+        if((t[2].equals("am") && hour != 12) || (t[2].equals("pm") && hour == 12)) {
             startTime += hour;
-        else if(hour != 12 && t[2].equals("pm"))
+        }
+        else if(hour != 12 && t[2].equals("pm")) {
             startTime += hour + 12;
+        }
 
         return startTime + minute(minute);
     }
@@ -673,16 +652,21 @@ public class PSS {
      * @return
      */
     private float minute(float minute) {
-        if(minute <= 15 && minute > 0)
+        if(minute <= 15 && minute > 0) {
             return (float) 0.25;
-        else if(minute <= 30 && minute > 15)
+        }
+        else if(minute <= 30 && minute > 15) {
             return (float) 0.5;
-        else if(minute <= 45 && minute > 30)
+        }
+        else if(minute <= 45 && minute > 30) {
             return (float) 0.75;
-        else if(minute <= 59 && minute > 45)
+        }
+        else if(minute <= 59 && minute > 45) {
             return 1;
-        else
+        }
+        else {
             return 0;
+        }
     }
 
     /**
@@ -705,12 +689,14 @@ public class PSS {
      */
     public void viewTask(String name) {
         boolean taskFound = false;
+
         for(Task task : tasks) {
             if(task.name.equals(name)) {
                 System.out.println("\n" + task.toString());
                 taskFound = true;
             }
         }
+
         if (taskFound == false) {
             System.out.println("\nTask not found.");
         }
@@ -721,8 +707,6 @@ public class PSS {
      * @param name
      */
     public void deleteTask(String name) {
-        boolean taskFound = false;
-        List<Task> candidatesForDeletion = new ArrayList<Task>();
         for(Task task : tasks)
             if(task.name.equals(name)) {
                 if(task.isAnti()) {
@@ -757,31 +741,12 @@ public class PSS {
                     }
                 }
 
-                candidatesForDeletion.add(task);
-                taskFound = true;
+                tasks.remove(task);
+                System.out.println("\nTask deleted.");
+                return;
             }
 
-        if (taskFound == false) {
-            System.out.println("\nTask not found.");
-        }
-        else {
-            if (candidatesForDeletion.size() > 1) {
-                viewTask(name); // should print multiple tasks with the same name.
-                System.out.println("\nAbove are the tasks with that name.");
-                int date = inputDate("Input the date of the task you want deleted (mm/dd/yyyy): ");
-                for (Task task: candidatesForDeletion) {
-                    if (task.date == date) {
-                        tasks.remove(task);
-                        isSaved = false;
-                    }
-                }
-            }
-            else {
-                tasks.remove(candidatesForDeletion.get(0));
-                isSaved = false;
-            }
-                System.out.println("\nTask deleted.");
-        }
+        System.out.println("\nTask not found.");
     }
 
     /**
@@ -972,37 +937,6 @@ public class PSS {
     }
 
     /**
-     * Gets user input for filename and writes the specified schedule to a file
-     * @param username
-     * @param schedule  The schedule that is to be written to a file.
-     */
-    public void writeSchedule(String username, List<Task> schedule) {
-        String filepath = username + "/";
-        String filename;
-
-        // makes sure file is json
-        do {
-            System.out.print("Enter filename: ");
-            filename = kb.nextLine();
-
-            if(!filename.contains(".json"))
-                System.out.println("\nMust be JSON file.");
-        } while(!filename.contains(".json"));
-        
-        // checks if the file exists
-        if(new File(filepath + filename).exists()) {
-            System.out.print("\nFile already exists.\nWould you like to overwrite?(y/n): ");
-            
-            // asks to overwrite if the file exists
-            if(kb.nextLine().toLowerCase().charAt(0) == 'y')
-                dataFile.write(schedule, filepath + filename);
-        }
-        else {
-            dataFile.write(schedule, filepath + filename);
-        }
-    }
-
-    /**
      * Gets user input for filename and writes the user's entire schedule to a file
      * @param   username    The user who is writing their schedule to a file
      */
@@ -1012,22 +946,44 @@ public class PSS {
     }
 
     /**
+     * Gets user input for filename and writes the specified schedule to a file
+     * @param username
+     * @param schedule  The schedule that is to be written to a file.
+     */
+    public void writeSchedule(String username, List<Task> schedule) {
+        String filepath = username + "/";
+        String filename = getFilename();
+
+        if(filename.equals("")) {
+            return;
+        }
+        
+        // checks if the file exists
+        if(new File(filepath + filename).exists()) {
+            System.out.print("\nFile already exists.\nWould you like to overwrite?(y/n): ");
+            
+            // asks to overwrite if the file exists
+            if(kb.nextLine().toLowerCase().charAt(0) == 'y') {
+                dataFile.write(schedule, filepath + filename);
+            }
+        }
+        else {
+            dataFile.write(schedule, filepath + filename);
+        }
+    }
+
+    /**
      * Gets user input for filename and reads from the file
      * @param username
      */
     public void readSchedule(String username) {
         String filepath = username + "/";
-        String filename;
+        String filename = getFilename();
 
-        // makes sure file is json
-        do {
-            System.out.print("Enter filename: ");
-            filename = kb.nextLine();
+        if(filename.equals("")) {
+            return;
+        }
 
-            if(!filename.contains(".json"))
-                System.out.println("\nMust be JSON file.");
-        } while(!filename.contains(".json"));
-        
         // checks if the file exists
         if(new File(filepath + filename).exists()) {
             dataFile.read(tasks, filepath + filename);
@@ -1038,22 +994,39 @@ public class PSS {
     }
 
     /**
+     * Gets user input for the filename to write or read from
+     * @return
+     */
+    private String getFilename() {
+        String filename;
+        int count = 0;
+
+        // makes sure file is json
+        do {
+            System.out.print("Enter filename: ");
+            filename = kb.nextLine();
+            count++;
+
+            if(count == 3) {
+                System.out.println("\nToo many attempts.");
+                return "";
+            }
+
+            if(!filename.contains(".json")) {
+                System.out.println("\nMust be JSON file.");
+            }
+        } while(!filename.contains(".json"));
+
+        return filename;
+    }
+
+    /**
      * Creates a schedule for a single day in increasing order from time
      */
     public void daySchedule() {
-        String startDate;
-        int count = 0;
+        String startDate = getDateInput("Enter date of tasks(mm/dd/yyyy): ");
 
-        // gets user input for start date
-        do {
-            System.out.print("Enter day to view tasks(mm/dd/yyyy): ");
-            startDate = kb.nextLine();
-
-            if(!isDateCorrect(startDate))
-                count++;
-        } while(!isDateCorrect(startDate) && count < 3);
-
-        if(count == 3) {
+        if(startDate.equals("")) {
             System.out.println("\nToo many attempts.");
             return;
         }
@@ -1070,19 +1043,9 @@ public class PSS {
      * Creates a schedule for a week in increasing order from time and day
      */
     public void weekSchedule() {
-        String startDate;
-        int count = 0;
+        String startDate = getDateInput("Enter date of tasks(mm/dd/yyyy): ");
 
-        // gets user input for start date
-        do {
-            System.out.print("Enter day to view tasks(mm/dd/yyyy): ");
-            startDate = kb.nextLine();
-
-            if(!isDateCorrect(startDate))
-                count++;
-        } while(!isDateCorrect(startDate) && count < 3);
-
-        if(count == 3) {
+        if(startDate.equals("")) {
             System.out.println("\nToo many attempts.");
             return;
         }
@@ -1099,19 +1062,9 @@ public class PSS {
      * Creates a schedule for a month in increasing order from time and day
      */
     public void monthSchedule() {
-        String startDate;
-        int count = 0;
+        String startDate = getDateInput("Enter date of tasks(mm/dd/yyyy): ");
 
-        // gets user input for start date
-        do {
-            System.out.print("Enter day to view tasks(mm/dd/yyyy): ");
-            startDate = kb.nextLine();
-
-            if(!isDateCorrect(startDate))
-                count++;
-        } while(!isDateCorrect(startDate) && count < 3);
-
-        if(count == 3) {
+        if(startDate.equals("")) {
             System.out.println("\nToo many attempts.");
             return;
         }
@@ -1125,45 +1078,43 @@ public class PSS {
     }
 
     public void writeDaySchedule(String username) {
+        String startDate = getDateInput("Enter date of tasks(mm/dd/yyyy): ");
+
+        if(startDate.equals("")) {
+            System.out.println("\nToo many attempts.");
+            return;
+        }
+
+        int date = dateConversion(startDate);
         int durationInDays = 1;
-        int date = inputDate("Input the date (mm/dd/yyyy): ");
         ArrayList<Task> tasksInDay = getTasksInPeriod(date, durationInDays);
         writeSchedule(username, tasksInDay);
     }
     public void writeWeekSchedule(String username) {
+        String startDate = getDateInput("Enter date of tasks(mm/dd/yyyy): ");
+
+        if(startDate.equals("")) {
+            System.out.println("\nToo many attempts.");
+            return;
+        }
+
+        int date = dateConversion(startDate);
         int durationInDays = 7;
-        int date = inputDate("Input the first date of the week (mm/dd/yyyy): ");
         ArrayList<Task> tasksInWeek = getTasksInPeriod(date, durationInDays);
         writeSchedule(username, tasksInWeek);
     }
     public void writeMonthSchedule(String username) {
+        String startDate = getDateInput("Enter date of tasks(mm/dd/yyyy): ");
+
+        if(startDate.equals("")) {
+            System.out.println("\nToo many attempts.");
+            return;
+        }
+
+        int date = dateConversion(startDate);
         int durationInDays = 30;
-        int date = inputDate("Input the first date of the month (mm/dd/yyyy): ");
         ArrayList<Task> tasksInMonth = getTasksInPeriod(date, durationInDays);
         writeSchedule(username, tasksInMonth);
-    }
-
-
-    public int inputDate(String prompt) {
-        String startDate;
-        int count = 0;
-
-        // gets user input for start date
-        do {
-            System.out.print(prompt);
-            startDate = kb.nextLine();
-
-            if(!isDateCorrect(startDate))
-                count++;
-        } while(!isDateCorrect(startDate) && count < 3);
-
-        if(count == 3) {
-            System.out.println("\nToo many attempts.");
-            return -1;
-        }
-        int date = dateConversion(startDate);
-
-        return date;
     }
 
     /**
