@@ -82,6 +82,7 @@ public class Main {
                         user = new User();
                         break;
                     case'n':
+                        pss.exitWriteSchedule(user.username);
                         run = false;
                         break;
                 }

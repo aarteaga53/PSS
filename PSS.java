@@ -8,6 +8,15 @@ public class PSS {
     private Scanner kb = new Scanner(System.in);
     ArrayList<Task> tasks;
     DataFile dataFile;
+    /**
+     * Whether or not the currently loaded schedule and the changes the user
+     * made to it, if any, have been saved to a file. Is true only if the
+     * entire schedule was saved to a file at once since the last change to
+     * the schedule, or if no changes were made to the schedule. Saving a 
+     * schedule for a day, week, or month does not count as saving the 
+     * currently loaded file.
+     */
+    boolean isSaved = true;
 
     public PSS() {
         tasks = new ArrayList<>();
@@ -50,6 +59,50 @@ public class PSS {
                 dataFile.read(tasks, filename);
             }
         }
+    }
+
+    /**
+     * Upon exiting the user is asked if they would like to save their
+     * currently loaded schedule, if it has not been saved already.
+     * @param username
+     */
+    public void exitWriteSchedule(String username) {
+        int option = -1;     
+        String menu =   "\nYou have not saved your whole raw schedule to a file" +
+                        "\nWould you like to save your whole schedule to a file?" +
+                        "\n\t(1) Yes" +
+                        "\n\t(2) No";
+        // remember to set isSaved to false when changes have been made
+        // and true when they have been saved
+        if(isSaved == false) {
+            do {
+                System.out.println(menu);
+                option = inputOption(1, 2);
+            } while (option == -1); // repeat prompt if user had too many attempts
+            if (option == 1) {     // if the user chose to save to a file
+                writeSchedule(username);
+            }
+        }
+    }
+
+    private int inputOption(int firstValidOption, int lastValidOption) {
+        String input;       // The string the user inputs
+        int option = -1;    // The integer verson of the user's input
+        int count = 0;      // The number of attempts to enter the option
+        boolean isValid;    // Whether the option is a valid option
+        do {
+            System.out.print("Enter option: ");
+            input = kb.nextLine();
+            count++;
+
+            if(count == 3) {
+                System.out.println("\nToo many attempts");
+                return -1;
+            }
+            option = Integer.parseInt(input);
+            isValid = (firstValidOption <= option && option <= lastValidOption);
+        } while(!isValid);
+        return option;
     }
 
     /**
@@ -227,8 +280,11 @@ public class PSS {
 
         if(conflicts(newTask))
             System.out.println("\nAnti Task does not cancel a recurring task.");
-        else
+        else {
             tasks.add(newTask);
+            isSaved = false;
+        }
+        
     }
 
     /**
@@ -295,6 +351,7 @@ public class PSS {
             System.out.println("\nThis task conflicts with an existing task.");
         else
             tasks.add(newTask);
+            isSaved = false;
     }
 
     /**
@@ -395,6 +452,7 @@ public class PSS {
             System.out.println("\nThis task conflicts with an existing task.");
         else
             tasks.add(newTask);
+            isSaved = false;
     }
 
     /**
@@ -686,6 +744,7 @@ public class PSS {
                     if(temp.links.size() > 0) {
                         for (AntiTask a : temp.links) {
                             tasks.remove(a);
+                            isSaved = false;
                         }
                     }
                 }
@@ -713,11 +772,13 @@ public class PSS {
                 for (Task task: candidatesForDeletion) {
                     if (task.date == date) {
                         tasks.remove(task);
+                        isSaved = false;
                     }
                 }
             }
             else {
                 tasks.remove(candidatesForDeletion.get(0));
+                isSaved = false;
             }
                 System.out.println("\nTask deleted.");
         }
@@ -947,6 +1008,7 @@ public class PSS {
      */
     public void writeSchedule(String username) {
         writeSchedule(username, tasks);
+        isSaved = true;
     }
 
     /**
