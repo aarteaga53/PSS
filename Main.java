@@ -10,7 +10,9 @@ public class Main {
         PSS pss = new PSS();
         char option;
 
+        // Keeps the entire program running
         while(run) {
+            // Keeps the login/signup menu running
             while(user.username == null && run) {
                 option = getStartOption();
 
@@ -31,8 +33,9 @@ public class Main {
                 pss.loadSchedule(user.username);
             }
 
+            // Keeps the pss actions menu running
             while(user.username != null && run) {
-                option = getOption();    
+                option = getActionOption();    
 
                 switch(option) {
                     case'a':
@@ -90,7 +93,7 @@ public class Main {
      * Gets user input for pss action
      * @return
      */
-    private static char getOption() {
+    private static char getActionOption() {
         String option;
         String prompt = "\nChoose PSS action.\n" +
             "\ta) Create a task\n\tb) View a task\n" +
