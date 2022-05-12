@@ -23,17 +23,8 @@ public class Task implements Comparable<Task> {
      * @return
      */
     public boolean isAnti() {
-        // tries to access an attribute only Anti tasks have.
-        // if an exception is thrown, then it could be that the task
-        // is not a Anti task.
-        boolean isAnti = false;
-        try {
-            AntiTask testTask = (AntiTask) this;
-            testTask.links = testTask.links;
-            isAnti = true;
-        }
-        catch (Exception x) {}
-        return isAnti;
+        String[] types = type.split("-");
+        return types[1].equals("Anti");
     }
 
     /**
@@ -41,26 +32,8 @@ public class Task implements Comparable<Task> {
      * @return
      */
     public boolean isTransient() {
-        // tries to access a recurring task attribute and an anti task
-        // attribute. If it fails both accesses, then it might be a
-        // transient task
-        boolean isRecurring = false;
-        try {
-            RecurringTask testTask = (RecurringTask) this;
-            testTask.endDate = testTask.endDate;
-            isRecurring = true;
-        }
-        catch (Exception x) {}
-        boolean isAnti = false;
-        try {
-            AntiTask testTask = (AntiTask) this;
-            testTask.links = testTask.links;
-            isAnti = true;
-        }
-        catch (Exception x) {}
-
-        boolean isTransient = (isRecurring == false && isAnti == false);
-        return isTransient;
+        String[] types = type.split("-");
+        return types[1].equals("Transient");
     }
 
     /**
@@ -68,17 +41,8 @@ public class Task implements Comparable<Task> {
      * @return
      */
     public boolean isRecurring() {
-        // tries to access an attribute only recurring tasks have.
-        // if an exception is thrown, then it could be that the task
-        // is not a recurring task.
-        boolean isRecurring = false;
-        try {
-            RecurringTask testTask = (RecurringTask) this;
-            testTask.endDate = testTask.endDate;
-            isRecurring = true;
-        }
-        catch (Exception x) {}
-        return isRecurring;
+        String[] types = type.split("-");
+        return types[1].equals("Recurring");
     }
 
     /**
@@ -183,7 +147,7 @@ public class Task implements Comparable<Task> {
     }
 
     public String toString() {
-        return name + "\n" + type + "\n" + timeConversion() + "\n" + durationConversion();
+        return name + "\n" + type.split("-")[0] + "\n" + timeConversion() + "\n" + durationConversion();
     }
 
     /**

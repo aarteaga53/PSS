@@ -62,7 +62,7 @@ public class DataFile {
                 if(line.equals("\t},") || line.equals("\t}")) {
                     Task newTask = new Task(type);
 
-                    if(newTask.isRecurring()) { // can replace with "if type is recurring type"
+                    if(newTask.isRecurring()) {
                         newTask = new RecurringTask(name, type, startTime, duration, date, endDate, frequency);
                     }  
                     else if(newTask.isTransient()) {
@@ -101,10 +101,12 @@ public class DataFile {
                         startTime = Float.parseFloat(split[1].substring(0, split[1].indexOf(",")));
                     }
                     else if(split[0].equals("\t\t\"Duration\"")) {
-                        if(split[1].indexOf(",") < 0)
+                        if(split[1].indexOf(",") < 0) {
                             duration = Float.parseFloat(split[1]);
-                        else
+                        }
+                        else {
                             duration = Float.parseFloat(split[1].substring(0, split[1].indexOf(",")));
+                        }
                     }  
                     else if(split[0].equals("\t\t\"EndDate\"")) {
                         endDate = Integer.parseInt(split[1].substring(0, split[1].indexOf(",")));
