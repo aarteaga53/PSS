@@ -718,9 +718,172 @@ public class PSS {
      * @param name
      */
     public void editTask(String name) {
+        boolean exit = false;
         for(Task task : tasks)
             if(task.name.equals(name)) {
+                System.out.println("\n" + task.toString());
 
+                if(task.isAnti() || task.isTransient()){
+                    do{
+                        System.out.println("\tEdit Task: \n"+
+                                            "\t 1: Change Task Name\n"+
+                                            "\t 2: Change Task Date\n"+
+                                            "\t 3: Change Task Start Time\n"+
+                                            "\t 4: Change Task Duration\n"+
+                                            "\t 5: Exit Editor");
+                        String option = kb.nextLine();
+                        switch(option){
+                            case "1":
+                                System.out.print("Enter New Name: ");
+                                task.name = kb.nextLine();
+                                break;
+                            case "2":
+                                System.out.print("Enter New Date (mm/dd/yyyy): ");
+                                int oldDate = task.date;
+                                String newDate = kb.nextLine();
+                                if(isDateCorrect(newDate))
+                                    task.date = dateConversion(newDate);
+                                if(conflicts(task)){
+                                    task.date = oldDate;
+                                    System.out.println("Conflicts Detected. Changes not saved.");
+                                }
+                                else{
+                                    System.out.println("Changes Saved");
+                                }
+                                break;
+                            case "3":
+                                System.out.print("Enter New Start Time(hh:mm am/pm): ");
+                                float oldTime = task.startTime;
+                                String newTime = kb.nextLine();
+                                if(isStartTimeCorrect(newTime))
+                                    task.startTime = timeConversion(newTime);
+                                if(conflicts(task)){
+                                    task.startTime = oldTime;
+                                    System.out.println("Conflicts Detected. Changes not saved.");
+                                }
+                                else{
+                                    System.out.println("Changes Saved");
+                                }
+                                break;
+                            case "4":
+                                System.out.print("Enter New Duration(hh:mm): ");
+                                float oldDuration = task.duration;
+                                String newDuration = kb.nextLine();
+                                if(isDurationCorrect(newDuration))
+                                    task.duration = durationConversion(newDuration);
+                                if(conflicts(task)){
+                                    task.duration = oldDuration;
+                                    System.out.println("Conflicts Detected. Changes not saved.");
+                                }
+                                else{
+                                    System.out.println("Changes Saved");
+                                }
+                                break;
+                            case "5":
+                                exit = true;
+                                break;
+                            default: 
+                                System.out.println("Invaild Input");
+                                break;
+                        }
+                    }while(!exit);
+                }
+                else if(task.isRecurring()){
+                    do{ 
+                        RecurringTask temp = (RecurringTask) task;
+                        System.out.println("\tEdit Task: \n"+
+                                            "\t 1: Change Task Name\n"+
+                                            "\t 2: Change Task Start Date\n"+
+                                            "\t 3: Change Task Start Time\n"+
+                                            "\t 4: Change Task Duration\n"+
+                                            "\t 5: Change Task End Date\n"+
+                                            "\t 6: Change Task Frequency\n"+
+                                            "\t 7: Exit Editor");
+                        String option = kb.nextLine();
+                        switch(option){
+                            case "1":
+                                System.out.print("Enter New Name: ");
+                                task.name = kb.nextLine();
+                                break;
+                            case "2":
+                                System.out.print("Enter New Start Date(mm/dd/yyyy): ");
+                                int oldDate = task.date;
+                                String newDate = kb.nextLine();
+                                if(isDateCorrect(newDate))
+                                    task.date = dateConversion(newDate);
+                                if(conflicts(task)){
+                                    task.date = oldDate;
+                                    System.out.println("Conflicts Detected. Changes not saved.");
+                                }
+                                else{
+                                    System.out.println("Changes Saved");
+                                }
+                                break;
+                            case "3":
+                                System.out.print("Enter New Start Time(hh:mm am/pm): ");
+                                float oldTime = task.startTime;
+                                String newTime = kb.nextLine();
+                                if(isStartTimeCorrect(newTime))
+                                    task.startTime = timeConversion(newTime);
+                                if(conflicts(task)){
+                                    task.startTime = oldTime;
+                                    System.out.println("Conflicts Detected. Changes not saved.");
+                                }
+                                else{
+                                    System.out.println("Changes Saved");
+                                }
+                                break;
+                            case "4":
+                                System.out.print("Enter New Duration(hh:mm): ");
+                                float oldDuration = task.duration;
+                                String newDuration = kb.nextLine();
+                                if(isDurationCorrect(newDuration))
+                                    task.duration = durationConversion(newDuration);
+                                if(conflicts(task)){
+                                    task.duration = oldDuration;
+                                    System.out.println("Conflicts Detected. Changes not saved.");
+                                }
+                                else{
+                                    System.out.println("Changes Saved");
+                                }
+                                break;
+                            case "5": 
+                                System.out.print("Enter New End Date: ");
+                                int oldEnd = temp.endDate;
+                                String newEnd = kb.nextLine();
+                                if(isDateCorrect(newEnd))
+                                    temp.endDate = dateConversion(newEnd);
+                                if(conflicts(task)){
+                                    temp.endDate = oldEnd;
+                                    System.out.println("Conflicts Detected. Changes not saved.");
+                                }
+                                else{
+                                    System.out.println("Changes Saved");
+                                }
+                                break;
+                            case "6":
+                                System.out.print("Enter New Frequency (1 or 7): ");
+                                int oldFreq = temp.frequency;
+                                String newFreq = kb.nextLine();
+                                if(isFrequencyCorrect(newFreq))
+                                    temp.frequency = dateConversion(newFreq);
+                                if(conflicts(task)){
+                                    temp.frequency = oldFreq;
+                                    System.out.println("Conflicts Detected. Changes not saved.");
+                                }
+                                else{
+                                    System.out.println("Changes Saved");
+                                }
+                                break;
+                            case "7":
+                                exit = true;
+                                break;
+                            default: 
+                                System.out.println("Invaild Input");
+                                break;
+                        }
+                    }while(!exit);
+                }
                 return;
             }
 
