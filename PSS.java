@@ -346,6 +346,7 @@ public class PSS {
             System.out.println("\nAnti Task does not cancel a recurring task.");
         }
         else {
+            System.out.println("\nTask created.");
             tasks.add(newTask);
             isSaved = false;
         }
@@ -382,6 +383,7 @@ public class PSS {
             System.out.println("\nThis task conflicts with an existing task.");
         }
         else {
+            System.out.println("\nTask created.");
             tasks.add(newTask);
             isSaved = false;
         } 
@@ -429,6 +431,7 @@ public class PSS {
             System.out.println("\nThis task conflicts with an existing task.");
         }
         else {
+            System.out.println("\nTask created.");
             tasks.add(newTask);
             isSaved = false;
         }  
@@ -448,6 +451,9 @@ public class PSS {
             }
             if(task.isRecurring()) {
                 recurringPresent = true;
+            }
+            if(!task.conflicts(newTask) && newTask.isAnti()) {
+                return false;
             }
             if(task.conflicts(newTask)) {
                 return true;
@@ -975,7 +981,6 @@ public class PSS {
                                 }
                                 else{
                                     System.out.println("\nChanges Saved\n");
-                                    removeLinks(task);
                                 }
                                 break;
                             case "6":
@@ -1059,6 +1064,7 @@ public class PSS {
             // asks to overwrite if the file exists
             if(kb.nextLine().toLowerCase().charAt(0) == 'y') {
                 dataFile.write(schedule, filepath + filename);
+                System.out.println("\nSchedule saved.");
             }
         }
         else {
@@ -1081,6 +1087,7 @@ public class PSS {
         // checks if the file exists
         if(new File(filepath + filename).exists()) {
             dataFile.read(tasks, filepath + filename);
+            System.out.println("\nSchedule read.");
         }
         else {
             System.out.println("\nFile does not exist.");

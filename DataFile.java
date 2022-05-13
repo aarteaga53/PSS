@@ -56,8 +56,9 @@ public class DataFile {
             while(infile.hasNext()) {
                 String line = infile.nextLine();
 
-                if(line.equals("[") || line.equals("]") || line.equals("  {") || line.equals(""))
+                if(line.equals("[") || line.equals("]") || line.equals("  {") || line.equals("")) {
                     continue;
+                }
 
                 // creates a new task if the necessary variables have been read for a specific task type
                 if(line.equals("  },") || line.equals("  }")) {
@@ -86,6 +87,9 @@ public class DataFile {
                         // adds a new task if it is not a repeat
                         if(i == tasks.size()) {
                             tasks.add(newTask);
+                        }
+                        else {
+                            System.out.println("\nTask \"" + name + "\" was not added to schedule, because of a conflict.");
                         }
                     }
 
