@@ -27,7 +27,7 @@ public class DataFile {
                     text += ",\n";
             }
 
-            fw.write(text + "\n]");
+            fw.write(text + "\n]\n");
             fw.close();
         } catch(IOException e) {
             System.out.println("\nError writing to file.");
@@ -47,6 +47,7 @@ public class DataFile {
         float duration = 0;
         int endDate = 0;
         int frequency = 0;
+        int count = 0;
 
         try {
             File file = new File(filename);
@@ -55,53 +56,58 @@ public class DataFile {
             while(infile.hasNext()) {
                 String line = infile.nextLine();
 
-                if(line.equals("[") || line.equals("]") || line.equals("\t{"))
+                if(line.equals("[") || line.equals("]") || line.equals("  {") || line.equals(""))
                     continue;
 
                 // creates a new task if the necessary variables have been read for a specific task type
-                if(line.equals("\t},") || line.equals("\t}")) {
+                if(line.equals("  },") || line.equals("  }")) {
                     Task newTask = new Task(type);
 
-                    if(newTask.isRecurring()) {
+                    if(newTask.isRecurring() && count == 7) {
                         newTask = new RecurringTask(name, type, startTime, duration, date, endDate, frequency);
                     }  
-                    else if(newTask.isTransient()) {
+                    else if(newTask.isTransient() || (newTask.isRecurring() && count == 5)) {
                         newTask = new TransientTask(name, type, startTime, duration, date);
                     }
-                    else {
+                    else if(newTask.isAnti()) {
                         newTask = new AntiTask(name, type, startTime, duration, date);
                     }
 
-                    int i;
+                    if(newTask.isRecurring() || newTask.isTransient() || newTask.isAnti()) {
+                        int i;
 
-                    // checks that there is no conflicts with tasks
-                    for(i = 0; i < tasks.size(); i++) {
-                        if(tasks.get(i).conflicts(newTask) || tasks.get(i).name.equals(newTask.name)) {
-                            break;
+                        // checks that there is no conflicts with tasks
+                        for(i = 0; i < tasks.size(); i++) {
+                            if(tasks.get(i).conflicts(newTask) || tasks.get(i).name.equals(newTask.name)) {
+                                break;
+                            }
+                        }
+
+                        // adds a new task if it is not a repeat
+                        if(i == tasks.size()) {
+                            tasks.add(newTask);
                         }
                     }
 
-                    // adds a new task if it is not a repeat
-                    if(i == tasks.size())
-                        tasks.add(newTask);
+                    count = 0;
                 }
                 else {
                     String[] split = line.split(" : ");
 
                     // checks key and reads the value
-                    if(split[0].equals("\t\t\"Name\"")) {
+                    if(split[0].equals("    \"Name\"")) {
                         name = split[1].substring(split[1].indexOf("\"") + 1, split[1].lastIndexOf("\""));
                     }
-                    else if(split[0].equals("\t\t\"Type\"")) {
+                    else if(split[0].equals("    \"Type\"")) {
                         type = split[1].substring(split[1].indexOf("\"") + 1, split[1].lastIndexOf("\""));
                     }
-                    else if(split[0].equals("\t\t\"StartDate\"") || split[0].equals("\t\t\"Date\"")) {
+                    else if(split[0].equals("    \"StartDate\"") || split[0].equals("    \"Date\"")) {
                         date = Integer.parseInt(split[1].substring(0, split[1].indexOf(",")));
                     }
-                    else if(split[0].equals("\t\t\"StartTime\"")) {
+                    else if(split[0].equals("    \"StartTime\"")) {
                         startTime = Float.parseFloat(split[1].substring(0, split[1].indexOf(",")));
                     }
-                    else if(split[0].equals("\t\t\"Duration\"")) {
+                    else if(split[0].equals("    \"Duration\"")) {
                         if(split[1].indexOf(",") < 0) {
                             duration = Float.parseFloat(split[1]);
                         }
@@ -109,12 +115,14 @@ public class DataFile {
                             duration = Float.parseFloat(split[1].substring(0, split[1].indexOf(",")));
                         }
                     }  
-                    else if(split[0].equals("\t\t\"EndDate\"")) {
+                    else if(split[0].equals("    \"EndDate\"")) {
                         endDate = Integer.parseInt(split[1].substring(0, split[1].indexOf(",")));
                     }
-                    else if(split[0].equals("\t\t\"Frequency\"")) {
+                    else if(split[0].equals("    \"Frequency\"")) {
                         frequency = Integer.parseInt(split[1]);
                     }
+
+                    count++;
                 }
             }
 

@@ -71,8 +71,9 @@ public class AntiTask extends Task implements Cloneable {
     public boolean conflicts(Task task) {
         if(task.date == date && overlaps(task)) {
             if(task.isTransient() && !hasLink(task)) {
-                if(!links.contains(task))
+                if(!links.contains(task)) {
                     addLink((TransientTask) task);
+                }
                 return false;
             }
             else
@@ -82,19 +83,8 @@ public class AntiTask extends Task implements Cloneable {
         return false;
     }
 
-    /**
-     * Converts the task to JSON
-     */
-    public String convertJSON() {
-        return "\t{\n\t\t\"Name\" : \"" + name + "\",\n" +
-                "\t\t\"Type\" : \"" + type + "\",\n" +
-                "\t\t\"Date\" : " + date + ",\n" +
-                "\t\t\"StartTime\" : " + startTime + ",\n" +
-                "\t\t\"Duration\" : " + duration + "\n\t}";
-    }
-
     public String toString() {
-        return name + "\n" + type.split("-")[0] + "\n" + timeConversion() + "\n" + durationConversion() + "\n" + dateConversion(date);
+        return name + "\n" + type + "\n" + timeConversion() + "\n" + durationConversion() + "\n" + dateConversion(date);
     }
 
     @Override

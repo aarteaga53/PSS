@@ -30,19 +30,8 @@ public class TransientTask extends Task {
         return linkedTo != null;
     }
 
-    /**
-     * Converts the task to JSON
-     */
-    public String convertJSON() {
-        return "\t{\n\t\t\"Name\" : \"" + name + "\",\n" +
-                "\t\t\"Type\" : \"" + type + "\",\n" +
-                "\t\t\"Date\" : " + date + ",\n" +
-                "\t\t\"StartTime\" : " + startTime + ",\n" +
-                "\t\t\"Duration\" : " + duration + "\n\t}";
-    }
-
     public String toString() {
-        return name + "\n" + type.split("-")[0] + "\n" + timeConversion() + "\n" + durationConversion() + "\n" + dateConversion(date);
+        return name + "\n" + type + "\n" + timeConversion() + "\n" + durationConversion() + "\n" + dateConversion(date);
     }
 
     /**

@@ -49,10 +49,12 @@ public class RecurringTask extends Task implements Cloneable {
      */
     public boolean hasLink(Task link) {
         for(AntiTask a : links) {
-            if((!a.conflicts(link) && a.date == link.date) && link.isTransient())
+            if((!a.conflicts(link) && a.date == link.date) && link.isTransient()) {
                 return true;
-            else if(a.conflicts(link) && !link.isTransient())
+            }
+            else if(a.conflicts(link) && !link.isTransient()) {
                 return true;
+            }
         }
 
         return false;
@@ -73,10 +75,12 @@ public class RecurringTask extends Task implements Cloneable {
                             addLink((AntiTask) task);
                             return false;
                         }
-                        else if(task.isTransient() && hasLink(task))
+                        else if(task.isTransient() && hasLink(task)) {
                             return false;   
-                        else
+                        }
+                        else {
                             return true;
+                        }
                     }
     
                     next = nextDate(next, frequency);
@@ -132,8 +136,9 @@ public class RecurringTask extends Task implements Cloneable {
                 year++;
                 month = 1;
             }
-            else
+            else {
                 month++;
+            }
 
             day -= 31;
         }
@@ -163,17 +168,17 @@ public class RecurringTask extends Task implements Cloneable {
      * Converts the task to JSON
      */
     public String convertJSON() {
-        return "\t{\n\t\t\"Name\" : \"" + name + "\",\n" +
-                "\t\t\"Type\" : \"" + type + "\",\n" +
-                "\t\t\"StartDate\" : " + date + ",\n" +
-                "\t\t\"StartTime\" : " + startTime + ",\n" +
-                "\t\t\"Duration\" : " + duration + ",\n" +
-                "\t\t\"EndDate\" : " + endDate + ",\n" +
-                "\t\t\"Frequency\" : " + frequency + "\n\t}";
+        return "  {\n    \"Name\" : \"" + name + "\",\n" +
+                "    \"Type\" : \"" + type + "\",\n" +
+                "    \"StartDate\" : " + date + ",\n" +
+                "    \"StartTime\" : " + startTime + ",\n" +
+                "    \"Duration\" : " + duration + ",\n" +
+                "    \"EndDate\" : " + endDate + ",\n" +
+                "    \"Frequency\" : " + frequency + "\n  }";
     }
 
     public String toString() {
-        return name + "\n" + type.split("-")[0] + "\n" + timeConversion() + "\n" + durationConversion() + "\n" + dateConversion(date) + "\n" + dateConversion(endDate) + "\n" + ((frequency == 1) ? "Daily" : "Weekly");
+        return name + "\n" + type + "\n" + timeConversion() + "\n" + durationConversion() + "\n" + dateConversion(date) + "\n" + dateConversion(endDate) + "\n" + ((frequency == 1) ? "Daily" : "Weekly");
     }
 
     @Override

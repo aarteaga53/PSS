@@ -1,6 +1,7 @@
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Scanner;
 
 public class PSS {
@@ -30,8 +31,6 @@ public class PSS {
      */
     public void loadSchedule(String username) {
         String[] schedules = dataFile.readSchedules(username);
-        String option;
-        int count = 0;
 
         if(schedules.length > 0) {
             System.out.println("\nWould you like to load a schedule?\n\t0) Continue");
@@ -39,23 +38,17 @@ public class PSS {
             for(int i = 0; i < schedules.length; i++) {
                 System.out.println("\t" + (i + 1) + ") " + schedules[i]);
             }
-
-            do {
-                System.out.print("Enter option: ");
-                option = kb.nextLine();
-                count++;
-
-                if(count == 3) {
-                    System.out.println("\nToo many attempts, no schedule was loaded.");
-                    return;
-                }
-            } while(!isValid(0, schedules.length, option));
             
-            int num = Integer.parseInt(option);
+            int num = getOptionInput(0, schedules.length);
 
-            if(num <= schedules.length && num != 0) {
+            if(num <= 0) {
+                return;
+            }
+
+            if(num <= schedules.length) {
                 String filename = username + "/" + schedules[num-1];
                 dataFile.read(tasks, filename);
+                System.out.println("\nSchedule loaded.");
             }
         }
     }
@@ -65,9 +58,7 @@ public class PSS {
      * currently loaded schedule, if it has not been saved already.
      * @param username
      */
-    public void exitWriteSchedule(String username) {
-        String option;
-        int count = 0;     
+    public void exitWriteSchedule(String username) {    
         String menu =   "\nYou have not saved your whole raw schedule to a file" +
                         "\nWould you like to save your whole schedule to a file?" +
                         "\n\t1) Yes" +
@@ -75,26 +66,41 @@ public class PSS {
 
         // remember to set isSaved to false when changes have been made
         // and true when they have been saved
-        if(isSaved == false) {
+        if(!isSaved) {
             System.out.println(menu);
 
-            do {
-                System.out.print("Enter option: ");
-                option = kb.nextLine();
-                count++;
-
-                if(count == 3) {
-                    System.out.println("\nToo many attempts, file was not saved.");
-                    return;
-                }
-            } while (!isValid(1, 2, option)); // repeat prompt if user had too many attempts
-
-            int num = Integer.parseInt(option);
+            int num = getOptionInput(1, 2);
 
             if(num == 1) {     // if the user chose to save to a file
                 writeSchedule(username);
             }
         }
+    }
+
+    /**
+     * Gets user input for loadSchedule and exitWriteSchedule
+     * @param lower
+     * @param upper
+     * @return
+     */
+    private int getOptionInput(int lower, int upper) {
+        String option;
+        int count = 0;
+
+        do {
+            System.out.print("Enter option: ");
+            option = kb.nextLine();
+
+            if(count == 3) {
+                System.out.println("\nToo many attempts.");
+                return -1;
+            }
+            else {
+                count++;
+            }
+        } while(!isValid(lower, upper, option));
+
+        return Integer.parseInt(option);
     }
 
     /**
@@ -222,11 +228,13 @@ public class PSS {
         do {
             System.out.print("Enter task start time(hh:mm am/pm): ");
             startTime = kb.nextLine();
-            count++;
 
             if(count == 3) {
                 System.out.println("\nToo many attempts.");
                 return "";
+            }
+            else {
+                count++;
             }
         } while(!isStartTimeCorrect(startTime) && count < 3);
 
@@ -245,11 +253,13 @@ public class PSS {
         do {
             System.out.print("Enter task duration(hh:mm): ");
             duration = kb.nextLine();
-            count++;
 
             if(count == 3) {
                 System.out.println("\nToo many attempts.");
                 return "";
+            }
+            else {
+                count++;
             }
         } while(!isDurationCorrect(duration));
 
@@ -268,11 +278,13 @@ public class PSS {
         do {
             System.out.print(prompt);
             startDate = kb.nextLine();
-            count++;
 
             if(count == 3) {
                 System.out.println("\nToo many attempts.");
                 return "";
+            }
+            else {
+                count++;
             }
         } while(!isDateCorrect(startDate));
 
@@ -292,11 +304,13 @@ public class PSS {
         do {
             System.out.print("Enter task end date(mm/dd/yyyy): ");
             endDate = kb.nextLine();
-            count++;
 
             if(count == 3) {
                 System.out.println("\nToo many attempts.");
                 return "";
+            }
+            else {
+                count++;
             }
         } while(!isEndDateCorrect(startDate, endDate));
 
@@ -315,11 +329,13 @@ public class PSS {
         do {
             System.out.print("Enter task frequency(1/7): ");
             frequency = kb.nextLine();
-            count++;
 
             if(count == 3) {
                 System.out.println("\nToo many attempts.");
                 return "";
+            }
+            else {
+                count++;
             }
         } while(!isFrequencyCorrect(frequency));
 
@@ -479,8 +495,9 @@ public class PSS {
      * @return
      */
     private boolean isEndDateCorrect(String startDate, String endDate) {
-        if(!isDateCorrect(endDate))
+        if(!isDateCorrect(endDate)) {
             return false;
+        }
 
         return dateConversion(endDate) > dateConversion(startDate);
     }
@@ -491,16 +508,17 @@ public class PSS {
      * @return
      */
     private boolean isFrequencyCorrect(String frequency) {
-        int f;
+        int freq;
 
         try {
-            f = Integer.parseInt(frequency);
+            freq = Integer.parseInt(frequency);
         } catch(NumberFormatException e) {
             return false;
         }
 
-        if(f != 1 && f != 7)
+        if(freq != 1 && freq != 7) {
             return false;
+        }
 
         return true;
     }
@@ -515,8 +533,9 @@ public class PSS {
         int minute;
 
         // length must be 4 or 5
-        if(duration.length() > 5 || duration.length() < 4)
+        if(duration.length() > 5 || duration.length() < 4) {
             return false;
+        }
 
         try {
             String[] split = duration.split(":");
@@ -526,14 +545,18 @@ public class PSS {
             return false;
         }
 
-        if(hour > 23 || hour < 0)
+        if(hour > 23 || hour < 0) {
             return false;
-        else if(minute < 0 || minute > 59)
+        }
+        else if(minute < 0 || minute > 59) {
             return false;
-        else if(hour == 23 && minute > 45)
+        }
+        else if(hour == 23 && minute > 45) {
             return false;
-        else if(hour == 0 && minute == 0)
+        }
+        else if(hour == 0 && minute == 0) {
             return false;
+        }
 
         return true;
     }
@@ -549,8 +572,9 @@ public class PSS {
         String time;
 
         // length must be 7 or 8
-        if(startTime.length() > 8 || startTime.length() < 7)
+        if(startTime.length() > 8 || startTime.length() < 7) {
             return false;
+        }
 
         try {
             String[] split = startTime.split("[: ]");
@@ -561,18 +585,21 @@ public class PSS {
             return false;
         }
         
-        if(hour > 12 || hour < 1)
+        if(hour > 12 || hour < 1) {
             return false;
-        else if(minute < 0 || minute > 59)
+        }
+        else if(minute < 0 || minute > 59) {
             return false;
-        else if(!time.equals("am") && !time.equals("pm"))
+        }
+        else if(!time.equals("am") && !time.equals("pm")) {
             return false;
+        }
 
         return true;
     }
 
     /**
-     * Checks if the given date string is formatted correctly
+     * Checks if the given date string is formatted correctly and the date is proper
      * @param date
      * @return
      */
@@ -582,8 +609,9 @@ public class PSS {
         int year;
 
         // length must be 10
-        if(date.length() != 10) 
+        if(date.length() != 10) {
             return false;
+        }
 
         try {
             String[] split = date.split("/");
@@ -594,26 +622,33 @@ public class PSS {
             return false;
         }
 
-        if(month > 12 || month < 1) 
+        if(month > 12 || month < 1) {
             return false;
-        else if(day < 1)
+        }
+        else if(day < 1) {
             return false;
-        else if((month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) && day > 31)
+        }
+        else if((month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) && day > 31) {
             return false;
-        else if((month == 4 || month == 6 || month == 9 || month == 11) && day > 30)
+        }
+        else if((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) {
             return false;
+        }
         else if(month == 2) {
             if(year % 4 == 0) {
                 if(year % 100 == 0) {
-                    if(year % 400 == 0 && day > 29)
+                    if(year % 400 == 0 && day > 29) {
                         return false;
+                    }
                 }
             }
-            else if(day > 28)
+            else if(day > 28) {
                 return false;
+            }
         }
-        else if(year < 0)
+        else if(year < 0) {
             return false;
+        }
 
         return true;
     }
@@ -660,7 +695,7 @@ public class PSS {
     }
 
     /**
-     * Converts a minute to decimal
+     * Converts a minute to decimal point, and rounds to nearest 15 minutes
      * @param minute
      * @return
      */
@@ -725,27 +760,25 @@ public class PSS {
                 if(task.isAnti()) {
                     AntiTask temp = (AntiTask) task;
 
-                    if(temp.links.size() > 0) {
+                    if(temp.links.size() > 0) { // checks if there are any transient tasks that depend on this anti task
                         System.out.println("\nTask could not be removed.");
                         return;
                     }
-                    else {
+                    else { // removes any links to a recurring task
                         RecurringTask link = temp.linkedTo;
 
                         link.removeLink(temp);
                     }          
                 }
-                else if(task.isRecurring()) {
+                else if(task.isRecurring()) { // removes any anti tasks that are linked to this recurring task
                     RecurringTask temp = (RecurringTask) task;
 
-                    if(temp.links.size() > 0) {
-                        for (AntiTask a : temp.links) {
-                            tasks.remove(a);
-                            isSaved = false;
-                        }
+                    for (AntiTask a : temp.links) {
+                        tasks.remove(a);
+                        isSaved = false;
                     }
                 }
-                else if(task.isTransient()) {
+                else if(task.isTransient()) { // removes a link to anti task if there is one
                     TransientTask temp = (TransientTask) task;
                     AntiTask link = temp.linkedTo;
 
@@ -1099,10 +1132,11 @@ public class PSS {
         }
 
         int date = dateConversion(startDate);
-        int durationInDays = 1;
-        ArrayList<Task> tasksInDay = getTasksInPeriod(date, durationInDays);
+        int day = 1;
+        ArrayList<Task> tasksInDay = getTasksInPeriod(date, day);
         writeSchedule(username, tasksInDay);
     }
+
     public void writeWeekSchedule(String username) {
         String startDate = getDateInput("Enter date of tasks(mm/dd/yyyy): ");
 
@@ -1112,10 +1146,11 @@ public class PSS {
         }
 
         int date = dateConversion(startDate);
-        int durationInDays = 7;
-        ArrayList<Task> tasksInWeek = getTasksInPeriod(date, durationInDays);
+        int week = 7;
+        ArrayList<Task> tasksInWeek = getTasksInPeriod(date, week);
         writeSchedule(username, tasksInWeek);
     }
+
     public void writeMonthSchedule(String username) {
         String startDate = getDateInput("Enter date of tasks(mm/dd/yyyy): ");
 
@@ -1125,8 +1160,8 @@ public class PSS {
         }
 
         int date = dateConversion(startDate);
-        int durationInDays = 30;
-        ArrayList<Task> tasksInMonth = getTasksInPeriod(date, durationInDays);
+        int month = 30;
+        ArrayList<Task> tasksInMonth = getTasksInPeriod(date, month);
         writeSchedule(username, tasksInMonth);
     }
 

@@ -23,8 +23,9 @@ public class Task implements Comparable<Task> {
      * @return
      */
     public boolean isAnti() {
-        String[] types = type.split("-");
-        return types[1].equals("Anti");
+        boolean isAnti = type.equals("Cancellation");
+
+        return isAnti;
     }
 
     /**
@@ -32,8 +33,20 @@ public class Task implements Comparable<Task> {
      * @return
      */
     public boolean isTransient() {
-        String[] types = type.split("-");
-        return types[1].equals("Transient");
+        boolean isTransient = type.equals("Visit") || 
+        type.equals("Shopping") || type.equals("Appointment");
+
+        if(name != null) {
+            try {
+                TransientTask temp = (TransientTask) this;
+                temp.name = name;
+                isTransient = true;
+            } catch(ClassCastException e) {
+                isTransient = false;
+            }
+        }
+
+        return isTransient;
     }
 
     /**
@@ -41,8 +54,22 @@ public class Task implements Comparable<Task> {
      * @return
      */
     public boolean isRecurring() {
-        String[] types = type.split("-");
-        return types[1].equals("Recurring");
+        boolean isRecurring = type.equals("Class") ||
+        type.equals("Study") || type.equals("Sleep") ||
+        type.equals("Sleep") || type.equals("Exercise") ||
+        type.equals("Work") || type.equals("Meal");
+
+        if(name != null) {
+            try {
+                RecurringTask temp = (RecurringTask) this;
+                temp.name = name;
+                isRecurring = true;
+            } catch(ClassCastException e) {
+                isRecurring = false;
+            }
+        }
+
+        return isRecurring;
     }
 
     /**
@@ -64,14 +91,18 @@ public class Task implements Comparable<Task> {
         int hour = (int) duration;
         float minute = duration - hour;
 
-        if(minute == 0)
+        if(minute == 0) {
             dur = ":00";
-        else if(minute == .25)
+        }
+        else if(minute == .25) {
             dur = ":15";
-        else if(minute == .5)
+        }
+        else if(minute == .5) {
             dur = ":30";
-        else if(minute == .75)
+        }
+        else if(minute == .75) {
             dur = ":45";
+        }
 
         return hour + dur;
     }
@@ -85,23 +116,31 @@ public class Task implements Comparable<Task> {
         int hour = (int) startTime;
         float minute = startTime - hour;
 
-        if(minute == 0)
+        if(minute == 0) {
             time = ":00 ";
-        else if(minute == .25)
+        }
+        else if(minute == .25) {
             time = ":15 ";
-        else if(minute == .5)
+        }
+        else if(minute == .5) {
             time = ":30 ";
-        else if(minute == .75)
+        }
+        else if(minute == .75) {
             time = ":45 ";
+        }
 
-        if(hour == 0)
+        if(hour == 0) {
             time = "12" + time + "am";
-        else if(hour == 12)
+        }
+        else if(hour == 12) {
             time = "12" + time + "pm";
-        else if(hour < 12)
+        }
+        else if(hour < 12) {
             time = hour + time + "am";
-        else if(hour > 12)
+        }
+        else if(hour > 12) {
             time = (hour - 12) + time + "pm";
+        }
 
         return time;
     }
@@ -125,12 +164,15 @@ public class Task implements Comparable<Task> {
      * @return
      */
     public boolean overlaps(Task task) {
-        if(task.startTime == startTime)
+        if(task.startTime == startTime) {
             return true;
-        else if(task.startTime < startTime && task.startTime + task.duration > startTime)
+        }
+        else if(task.startTime < startTime && task.startTime + task.duration > startTime) {
             return true;
-        else if(task.startTime > startTime && startTime + duration > task.startTime)
+        }
+        else if(task.startTime > startTime && startTime + duration > task.startTime) {
             return true;
+        }
 
         return false;
     }
@@ -140,14 +182,15 @@ public class Task implements Comparable<Task> {
      * @return  String of task in JSON
      */
     public String convertJSON() {
-        return "\t{\n\t\t\"Name\" : \"" + name + "\",\n" +
-                "\t\t\"Type\" : \"" + type + "\",\n" +
-                "\t\t\"StartTime\" : " + startTime + ",\n" +
-                "\t\t\"Duration\" : " + duration + ",\n\t}";
+        return "  {\n    \"Name\" : \"" + name + "\",\n" +
+                "    \"Type\" : \"" + type + "\",\n" +
+                "    \"Date\" : " + date + ",\n" +
+                "    \"StartTime\" : " + startTime + ",\n" +
+                "    \"Duration\" : " + duration + "\n  }";
     }
 
     public String toString() {
-        return name + "\n" + type.split("-")[0] + "\n" + timeConversion() + "\n" + durationConversion();
+        return name + "\n" + type + "\n" + timeConversion() + "\n" + durationConversion();
     }
 
     /**
