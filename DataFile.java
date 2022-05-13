@@ -78,7 +78,7 @@ public class DataFile {
 
                         // checks that there is no conflicts with tasks
                         for(i = 0; i < tasks.size(); i++) {
-                            if(tasks.get(i).conflicts(newTask) || tasks.get(i).name.equals(newTask.name)) {
+                            if(tasks.get(i).conflicts(newTask)) {
                                 break;
                             }
                         }

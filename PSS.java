@@ -157,49 +157,22 @@ public class PSS {
         }
         
         // checks what type of task is going to be created
-        if(isTypeRecurring(type)) {
-            createRecurring(name, type + "-Recurring");
+        if(new Task(type).isRecurring()) {
+            createRecurring(name, type);
         }
-        else if(isTypeTransient(type)) {
-            createTransient(name, type + "-Transient");
+        else if(new Task(type).isTransient()) {
+            createTransient(name, type);
         }
         else {
-            createAnti(name, type + "-Anti");
+            createAnti(name, type);
         }
-    }
-
-    /** 
-     * checks if the task type is that of a recurring task.
-     * @return  True if the type is one of the recurring task types.
-     * */ 
-    private boolean isTypeRecurring(String type) {
-        return type.equals("Class") ||
-                type.equals("Study") || type.equals("Sleep") ||
-                type.equals("Sleep") || type.equals("Exercise") ||
-                type.equals("Work") || type.equals("Meal");
-    }
-
-    /** 
-     * checks if the task type is that of a transient task.
-     * @return  True if the type is one of the transient task types.
-     * */ 
-    private boolean isTypeTransient(String type) {
-        return type.equals("Visit") || 
-                type.equals("Shopping") || type.equals("Appointment");
-    }
-
-    /** 
-     * checks if the task type is that of a anti task.
-     * @return  True if the type is one of the anti task types.
-     * */ 
-    private boolean isTypeAnti(String type) {
-        return type.equals("Cancellation");
     }
 
     /**
      * Gets user input for task type
      */
     private String chooseType() {
+        Task type;
         String option;
         String prompt = "Choose task type:\n\tRecurring - Class\n\tRecurring - Study\n\tRecurring - Sleep\n\tRecurring - Exercise\n\tRecurring - Work\n\tRecurring - Meal" +
             "\n\tTransient - Visit\n\tTransient - Shopping\n\tTransient - Appointment\n\t     Anti - Cancellation\nEnter type: ";
@@ -208,10 +181,11 @@ public class PSS {
         do {
             System.out.print(prompt);
             option = kb.nextLine();
+            type = new Task(option);
 
-            if(!isTypeRecurring(option) && !isTypeTransient(option) && !isTypeAnti(option))
+            if(!type.isRecurring() && !type.isTransient() && !type.isAnti())
                 System.out.println("\nInvalid input.\n");
-        } while(!isTypeRecurring(option) && !isTypeTransient(option) && !isTypeAnti(option));
+        } while(!type.isRecurring() && !type.isTransient() && !type.isAnti());
 
         return option;
     }
@@ -755,6 +729,9 @@ public class PSS {
      * @param name
      */
     public void deleteTask(String name) {
+        boolean taskFound = false;
+        List<Task> candidatesForDeletion = new ArrayList<Task>();
+
         for(Task task : tasks)
             if(task.name.equals(name)) {
                 if(task.isAnti()) {
@@ -787,12 +764,34 @@ public class PSS {
                     }
                 }
 
-                tasks.remove(task);
-                System.out.println("\nTask deleted.");
-                return;
+                candidatesForDeletion.add(task);
+                taskFound = true;
             }
 
-        System.out.println("\nTask not found.");
+            if (!taskFound) {
+                System.out.println("\nTask not found.");
+            }
+            else {
+                if (candidatesForDeletion.size() > 1) {
+                    viewTask(name); // should print multiple tasks with the same name.
+
+                    System.out.println("\nAbove are the tasks with that name.");
+                    int date = Integer.parseInt(getDateInput("Input the date of the task you want deleted (mm/dd/yyyy): "));
+
+                    for (Task task : candidatesForDeletion) {
+                        if (task.date == date) {
+                            tasks.remove(task);
+                            isSaved = false;
+                        }
+                    }
+                }
+                else {
+                    tasks.remove(candidatesForDeletion.get(0));
+                    isSaved = false;
+                }
+
+                System.out.println("\nTask deleted.");
+            }
     }
 
     /**
@@ -1205,17 +1204,18 @@ public class PSS {
             if (day.conflicts(task)) {
                 if(task.isRecurring()) {
                     RecurringTask temp = (RecurringTask) task;
-                    String[] split = temp.type.split("-");
-                    String newType = split[0] + "-Transient";
-                    TransientTask t = new TransientTask(temp.name, newType, temp.startTime, temp.duration, day.date);
+                    TransientTask t = new TransientTask(temp.name, temp.type, temp.startTime, temp.duration, day.date);
 
                     if(temp.links.size() > 0) {
-                        for(AntiTask a : temp.links)
-                            if(!day.conflicts(a))
+                        for(AntiTask a : temp.links) {
+                            if(!day.conflicts(a)) {
                                 tasksInDay.add(t);
+                            }
+                        }
                     }
-                    else
+                    else {
                         tasksInDay.add(t);
+                    }
                 }
                 else if(task.isTransient()) {
                     tasksInDay.add(task);
