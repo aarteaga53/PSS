@@ -824,7 +824,17 @@ public class PSS {
                             // should check if the name is unique and >= 1 character
                             case "1":
                                 System.out.print("Enter New Name: ");
-                                task.name = kb.nextLine();
+                                String newName = kb.nextLine();
+                                boolean duplicates = false;
+                                for(Task atask : tasks){
+                                    if(atask.name.equals(newName)){
+                                        duplicates = true;
+                                    }
+                                }
+                                if(name.length() > 1 && !duplicates)
+                                    task.name = newName;
+                                else
+                                    System.out.println("New Name not Unique or Empty Input.");
                                 break;
                             case "2":
                                 System.out.print("Enter New Date (mm/dd/yyyy): ");
@@ -838,6 +848,7 @@ public class PSS {
                                 }
                                 else{
                                     System.out.println("\nChanges Saved\n");
+                                    removeLinks(task);
                                 }
                                 break;
                             case "3":
@@ -852,6 +863,7 @@ public class PSS {
                                 }
                                 else{
                                     System.out.println("\nChanges Saved\n");
+                                    removeLinks(task);
                                 }
                                 break;
                             case "4":
@@ -866,6 +878,7 @@ public class PSS {
                                 }
                                 else{
                                     System.out.println("\nChanges Saved\n");
+                                    removeLinks(task);
                                 }
                                 break;
                             case "5":
@@ -893,7 +906,17 @@ public class PSS {
                             // should check if the name is unique and >= 1 character
                             case "1":
                                 System.out.print("Enter New Name: ");
-                                task.name = kb.nextLine();
+                                String newName = kb.nextLine();
+                                boolean duplicates = false;
+                                for(Task atask : tasks){
+                                    if(atask.name.equals(newName)){
+                                        duplicates = true;
+                                    }
+                                }
+                                if(name.length() > 1 && !duplicates)
+                                    task.name = newName;
+                                else
+                                    System.out.println("New Name not Unique or Empty Input.");
                                 break;
                             case "2":
                                 System.out.print("Enter New Start Date(mm/dd/yyyy): ");
@@ -907,6 +930,7 @@ public class PSS {
                                 }
                                 else{
                                     System.out.println("\nChanges Saved\n");
+                                    removeLinks(task);
                                 }
                                 break;
                             case "3":
@@ -921,6 +945,7 @@ public class PSS {
                                 }
                                 else{
                                     System.out.println("\nChanges Saved\n");
+                                    removeLinks(task);
                                 }
                                 break;
                             case "4":
@@ -935,6 +960,7 @@ public class PSS {
                                 }
                                 else{
                                     System.out.println("\nChanges Saved\n");
+                                    removeLinks(task);
                                 }
                                 break;
                             case "5": 
@@ -949,6 +975,7 @@ public class PSS {
                                 }
                                 else{
                                     System.out.println("\nChanges Saved\n");
+                                    removeLinks(task);
                                 }
                                 break;
                             case "6":
@@ -963,6 +990,7 @@ public class PSS {
                                 }
                                 else{
                                     System.out.println("\nChanges Saved\n");
+                                    removeLinks(task);
                                 }
                                 break;
                             case "7":
@@ -979,6 +1007,27 @@ public class PSS {
         }
             
         System.out.println("\nTask not found.");
+    }
+
+    private void removeLinks(Task task){
+        if(task.isAnti()){
+            AntiTask temp = (AntiTask) task;
+            ArrayList<TransientTask> links = temp.links;
+            for(int i = 0; i < links.size(); i++){
+                temp.removeLink(links.get(i));
+            }
+        }
+        else if (task.isRecurring()){
+            RecurringTask temp = (RecurringTask) task;
+            ArrayList<AntiTask> links = temp.links;
+            for(int i = 0; i < links.size(); i++){
+                temp.removeLink(links.get(i));
+            }
+        }
+        else{
+            TransientTask temp = (TransientTask) task;
+            temp.removeLinkedTo();
+        }
     }
 
     /**
