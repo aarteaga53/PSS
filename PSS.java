@@ -169,6 +169,11 @@ public class PSS {
         return option;
     }
 
+    /**
+     * Gets user input for the name of the task
+     * @param prompt
+     * @return
+     */
     private String getNameInput(String prompt) {
         String name;
         int count = 0;
@@ -200,6 +205,7 @@ public class PSS {
 
     /**
      * Gets user input for the start time of the task
+     * @param prompt
      * @return
      */
     private String getStartTimeInput(String prompt) {
@@ -223,6 +229,7 @@ public class PSS {
 
     /**
      * Gets user input for the duration of the task
+     * @param prompt
      * @return
      */
     private String getDurationInput(String prompt) {
@@ -246,6 +253,7 @@ public class PSS {
 
     /**
      * Gets user input for start date of a task
+     * @param prompt
      * @return
      */
     private String getDateInput(String prompt) {
@@ -269,6 +277,7 @@ public class PSS {
 
     /**
      * Gets user input for the end date of the task
+     * @param prompt
      * @param startDate
      * @return
      */
@@ -293,6 +302,7 @@ public class PSS {
 
     /**
      * Gets user input for the frequency of the task
+     * @param prompt
      * @return
      */
     private String getFrequencyInput(String prompt) {
@@ -820,12 +830,13 @@ public class PSS {
 
                 if(task.isTransient()) {
                     do {
-                        System.out.println("\tEdit Task: \n"+
-                                            "\t 1: Change Task Name\n"+
-                                            "\t 2: Change Task Date\n"+
-                                            "\t 3: Change Task Start Time\n"+
-                                            "\t 4: Change Task Duration\n"+
-                                            "\t 5: Exit Editor");
+                        System.out.print("\nEdit Task\n"+
+                                            "\t1) Change Task Name\n"+
+                                            "\t2) Change Task Date\n"+
+                                            "\t3) Change Task Start Time\n"+
+                                            "\t4) Change Task Duration\n"+
+                                            "\t5) Exit Editor\n"+
+                                            "Enter option: ");
                         String option = kb.nextLine();
 
                         switch(option){
@@ -834,10 +845,10 @@ public class PSS {
                                 
                                 if(!newName.equals("")) {
                                     task.name = newName;
-                                    System.out.println("\nChanges Saved.\n");
+                                    System.out.println("\nChanges Saved.");
                                 }
                                 else
-                                    System.out.println("New Name not Unique or Empty Input.");
+                                    System.out.println("\nNew Name not Unique or Empty Input.");
                                 break;
                             case "2":
                                 int oldDate = task.date;
@@ -847,12 +858,12 @@ public class PSS {
                                     task.date = dateConversion(newDate);
                                 if(conflicts(task)) {
                                     task.date = oldDate;
-                                    System.out.println("\nConflicts Detected. Changes not saved.\n");
+                                    System.out.println("\nConflicts Detected. Changes not saved.");
                                 }
                                 else {
                                     removeTransientLink((TransientTask) task);
 
-                                    System.out.println("\nChanges Saved\n");
+                                    System.out.println("\nChanges Saved");
                                 }
                                 break;
                             case "3":
@@ -863,12 +874,12 @@ public class PSS {
                                     task.startTime = timeConversion(newTime);
                                 if(conflicts(task)) {
                                     task.startTime = oldTime;
-                                    System.out.println("\nConflicts Detected. Changes not saved.\n");
+                                    System.out.println("\nConflicts Detected. Changes not saved.");
                                 }
                                 else {
                                     removeTransientLink((TransientTask) task);
 
-                                    System.out.println("\nChanges Saved\n");
+                                    System.out.println("\nChanges Saved");
                                 }
                                 break;
                             case "4":
@@ -879,34 +890,36 @@ public class PSS {
                                     task.duration = durationConversion(newDuration);
                                 if(conflicts(task)) {
                                     task.duration = oldDuration;
-                                    System.out.println("\nConflicts Detected. Changes not saved.\n");
+                                    System.out.println("\nConflicts Detected. Changes not saved.");
                                 }
                                 else {
                                     removeTransientLink((TransientTask) task);
 
-                                    System.out.println("\nChanges Saved\n");
+                                    System.out.println("\nChanges Saved");
                                 }
                                 break;
                             case "5":
                                 exit = true;
                                 break;
                             default: 
-                                System.out.println("\nInvaild Input\n");
+                                System.out.println("\nInvaild Input");
                                 break;
                         }
-                    }while(!exit);
+                    } while(!exit);
                 }
-                else if(task.isRecurring()){
+                else if(task.isRecurring()) {
+                    RecurringTask temp = (RecurringTask) task;
+
                     do{ 
-                        RecurringTask temp = (RecurringTask) task;
-                        System.out.println("\tEdit Task: \n"+
-                                            "\t 1: Change Task Name\n"+
-                                            "\t 2: Change Task Start Date\n"+
-                                            "\t 3: Change Task Start Time\n"+
-                                            "\t 4: Change Task Duration\n"+
-                                            "\t 5: Change Task End Date\n"+
-                                            "\t 6: Change Task Frequency\n"+
-                                            "\t 7: Exit Editor");
+                        System.out.print("\nEdit Task\n"+
+                                            "\t1) Change Task Name\n"+
+                                            "\t2) Change Task Start Date\n"+
+                                            "\t3) Change Task Start Time\n"+
+                                            "\t4) Change Task Duration\n"+
+                                            "\t5) Change Task End Date\n"+
+                                            "\t6) Change Task Frequency\n"+
+                                            "\t7) Exit Editor\n"+ 
+                                            "Enter option: ");
                         String option = kb.nextLine();
 
                         switch(option) {
@@ -915,10 +928,10 @@ public class PSS {
                                     
                                 if(!newName.equals("")) {
                                     task.name = newName;
-                                    System.out.println("\nChanges Saved.\n");
+                                    System.out.println("\nChanges Saved.");
                                 }
                                 else
-                                    System.out.println("New Name not Unique or Empty Input.");
+                                    System.out.println("\nNew Name not Unique or Empty Input.");
                                 break;
                             case "2":
                                 int oldDate = task.date;
@@ -928,12 +941,12 @@ public class PSS {
                                     task.date = dateConversion(newDate);
                                 if(conflicts(task)) {
                                     task.date = oldDate;
-                                    System.out.println("\nConflicts Detected. Changes not saved.\n");
+                                    System.out.println("\nConflicts Detected. Changes not saved.");
                                 }
                                 else {
-                                    removeTransientLink((TransientTask) task);
+                                    removeRecurringLink(temp);
 
-                                    System.out.println("\nChanges Saved\n");
+                                    System.out.println("\nChanges Saved");
                                 }
                                 break;
                             case "3":
@@ -944,12 +957,12 @@ public class PSS {
                                     task.startTime = timeConversion(newTime);
                                 if(conflicts(task)) {
                                     task.startTime = oldTime;
-                                    System.out.println("\nConflicts Detected. Changes not saved.\n");
+                                    System.out.println("\nConflicts Detected. Changes not saved.");
                                 }
                                 else {
-                                    removeTransientLink((TransientTask) task);
+                                    removeRecurringLink(temp);
 
-                                    System.out.println("\nChanges Saved\n");
+                                    System.out.println("\nChanges Saved");
                                 }
                                 break;
                             case "4":
@@ -960,10 +973,10 @@ public class PSS {
                                     task.duration = durationConversion(newDuration);
                                 if(conflicts(task)) {
                                     task.duration = oldDuration;
-                                    System.out.println("\nConflicts Detected. Changes not saved.\n");
+                                    System.out.println("\nConflicts Detected. Changes not saved.");
                                 }
                                 else {
-                                    removeTransientLink((TransientTask) task);
+                                    removeRecurringLink(temp);
 
                                     System.out.println("\nChanges Saved\n");
                                 }
@@ -976,12 +989,12 @@ public class PSS {
                                     temp.endDate = dateConversion(newEnd);
                                 if(conflicts(task)){
                                     temp.endDate = oldEnd;
-                                    System.out.println("\nConflicts Detected. Changes not saved.\n");
+                                    System.out.println("\nConflicts Detected. Changes not saved.");
                                 }
                                 else{
-                                    removeRecurringLink((RecurringTask) task);
+                                    removeRecurringLink(temp);
 
-                                    System.out.println("\nChanges Saved\n");
+                                    System.out.println("\nChanges Saved");
                                 }
                                 break;
                             case "6":
@@ -992,19 +1005,19 @@ public class PSS {
                                     temp.frequency = Integer.parseInt(newFreq);
                                 if(conflicts(task)){
                                     temp.frequency = oldFreq;
-                                    System.out.println("\nConflicts Detected. Changes not saved.\n");
+                                    System.out.println("\nConflicts Detected. Changes not saved.");
                                 }
                                 else {
-                                    removeRecurringLink((RecurringTask) task);
+                                    removeRecurringLink(temp);
 
-                                    System.out.println("\nChanges Saved\n");
+                                    System.out.println("\nChanges Saved");
                                 }
                                 break;
                             case "7":
                                 exit = true;
                                 break;
                             default: 
-                                System.out.println("\nInvaild Input\n");
+                                System.out.println("\nInvaild Input");
                                 break;
                         }
                     } while(!exit);
@@ -1044,7 +1057,7 @@ public class PSS {
                 }
             }
             else {
-                System.out.println("\nAntiTask \"" + a.get(0).name + "\" was deleted.\n");
+                System.out.println("\nAntiTask \"" + a.get(0).name + "\" was deleted.");
                 tasks.remove(a.get(0));
                 task.removeLink(a.get(0));
             }
@@ -1252,7 +1265,7 @@ public class PSS {
 
     /**
      * Returns a list of tasks occuring within a given period
-     * @param startDate
+     * @param date
      * @param durationInDays
      * @return
      */
@@ -1280,7 +1293,7 @@ public class PSS {
 
     /**
      * Returns a list of tasks for a given date
-     * @param date
+     * @param day
      * @return 
      */
     private ArrayList<Task> getTasksInDay(RecurringTask day) {
