@@ -151,6 +151,9 @@ public class Task implements Comparable<Task> {
      * @return
      */
     public boolean conflicts(Task task) {
+        if(task.isRecurring()) {
+            return task.conflicts(this);
+        }
         if(task.date == date) {
             return overlaps(task);
         }

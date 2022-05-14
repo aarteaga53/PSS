@@ -35,7 +35,7 @@ public class RecurringTask extends Task implements Cloneable {
      */
     public void removeLink(AntiTask link) {
         for(TransientTask t : link.links) {
-            link.removeLink(t);
+            t.removeLinkedTo();
         }
 
         links.remove(link);
@@ -105,8 +105,9 @@ public class RecurringTask extends Task implements Cloneable {
                 }
 
                 for(int d : dates) {
-                    if(otherDates.contains(d))
+                    if(otherDates.contains(d)) {
                         return true;
+                    }
                 }
             }
         }

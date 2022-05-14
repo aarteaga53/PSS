@@ -22,31 +22,44 @@ public class User {
         Map<String, String> users = readUsers();
         String newUsername;
         String newPassword;
+        int attempts = 0;
 
         // gets username until a unique username is inputted
         do {
             System.out.print("Enter username: ");
             newUsername = kb.nextLine();
+            attempts++;
 
             if(newUsername.length() <= 1) {
                 System.out.println("\nUsername is too short.\n");
             }
-
             if(users.containsKey(newUsername)) {
                 System.out.println("\nUsername already exists.\n");
             }
-        } while(users.containsKey(newUsername) || newUsername.length() <= 1);
+        } while((users.containsKey(newUsername) || newUsername.length() <= 1) && attempts < 3);
+
+        if(attempts == 3) {
+            System.out.println("Too many attempts.\n");
+            return;
+        }
+        
+        attempts = 0;
 
         // gets password that is longer than 1 character
         do {
             System.out.print("Enter password: ");
             newPassword = kb.nextLine();
+            attempts++;
 
             if(newPassword.length() <= 1) {
                 System.out.println("\nPassword is too short.\n");
             }
-        } while(newPassword.length() <= 1);
-        
+        } while(newPassword.length() <= 1 && attempts < 3);
+
+        if(attempts == 3) {
+            System.out.println("Too many attempts.\n");
+            return;
+        }
 
         addUser(newUsername, newPassword);
         username = newUsername;
@@ -71,11 +84,12 @@ public class User {
             if(!users.containsKey(newUsername)) {
                 System.out.println("\nUsername does not exist.\n");
             }
-
-            if(attempts == 3) {
-                return;
-            }
         } while(!users.containsKey(newUsername));
+
+        if(attempts == 3) {
+            System.out.println("\nToo many attempts.");
+            return;
+        }
 
         attempts = 0;
 
@@ -88,11 +102,12 @@ public class User {
             if(!users.get(newUsername).equals(newPassword)) {
                 System.out.println("\nIncorrect password.\n");
             }
-
-            if(attempts == 3) {
-                return;
-            }
         } while(!users.get(newUsername).equals(newPassword));
+
+        if(attempts == 3) {
+            System.out.println("\nToo many attempts.");
+            return;
+        }
 
         username = newUsername;
         password = newPassword;

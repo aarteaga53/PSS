@@ -79,7 +79,19 @@ public class DataFile {
 
                         // checks that there is no conflicts with tasks
                         for(i = 0; i < tasks.size(); i++) {
-                            if(tasks.get(i).conflicts(newTask)) {
+                            if(!tasks.get(i).conflicts(newTask) && newTask.isAnti()) {
+                                continue;
+                            }
+                            else if (tasks.get(i).conflicts(newTask) && !newTask.isAnti()) {
+                                if(newTask.isTransient()) {
+                                    TransientTask t = (TransientTask) newTask;
+                    
+                                    if(t.isLinkedTo()) {
+                                        AntiTask a = t.linkedTo;
+                    
+                                        a.removeLink(t);
+                                    }
+                                }
                                 break;
                             }
                         }
