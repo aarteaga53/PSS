@@ -59,10 +59,10 @@ public class AntiTask extends Task implements Cloneable {
 
     /**
      * Links this anti task to the recurring task that it cancels
-     * @param r
+     * @param link
      */
-    public void linkTo(RecurringTask r) {
-        linkedTo = r;
+    public void linkTo(RecurringTask link) {
+        linkedTo = link;
     }
 
     /**

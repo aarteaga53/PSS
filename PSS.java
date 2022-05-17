@@ -9,15 +9,7 @@ public class PSS {
     private Scanner kb = new Scanner(System.in);
     ArrayList<Task> tasks;
     DataFile dataFile;
-    /**
-     * Whether or not the currently loaded schedule and the changes the user
-     * made to it, if any, have been saved to a file. Is true only if the
-     * entire schedule was saved to a file at once since the last change to
-     * the schedule, or if no changes were made to the schedule. Saving a 
-     * schedule for a day, week, or month does not count as saving the 
-     * currently loaded file.
-     */
-    boolean isSaved = true;
+    boolean isSaved = true; // keeps track if the scheule has been saved everytime a creation/edit/deletion is made
 
     public PSS() {
         tasks = new ArrayList<>();
@@ -754,8 +746,9 @@ public class PSS {
     public void deleteTask(String name) {
         boolean taskFound = false;
         List<Task> candidatesForDeletion = new ArrayList<Task>();
+        ArrayList<AntiTask> linksToDelete = new ArrayList<>();
 
-        for(Task task : tasks)
+        for(Task task : tasks) {
             if(task.name.equals(name)) {
                 if(task.isAnti()) {
                     AntiTask temp = (AntiTask) task;
@@ -767,22 +760,22 @@ public class PSS {
                     else { // removes any links to a recurring task
                         RecurringTask link = temp.linkedTo;
 
+                        System.out.println("\nTransient Task \"" + link.name + "\" link removed.");
                         link.removeLink(temp);
+                        isSaved = false;
                     }          
                 }
                 else if(task.isRecurring()) { // removes any anti tasks that are linked to this recurring task
                     RecurringTask temp = (RecurringTask) task;
-
-                    for (AntiTask a : temp.links) {
-                        tasks.remove(a);
-                        isSaved = false;
-                    }
+                    linksToDelete = temp.links;
+                    isSaved = false;
                 }
                 else if(task.isTransient()) { // removes a link to anti task if there is one
                     TransientTask temp = (TransientTask) task;
                     AntiTask link = temp.linkedTo;
 
                     if (link != null) {
+                        System.out.println("\nAnti Task \"" + link.name + "\" link removed.");
                         link.removeLink(temp);
                     }
                 }
@@ -790,31 +783,48 @@ public class PSS {
                 candidatesForDeletion.add(task);
                 taskFound = true;
             }
+        } 
 
-            if (!taskFound) {
-                System.out.println("\nTask not found.");
+        if(!linksToDelete.isEmpty()) { // deletes any anti tasks that were linked to a recurring task
+            while(!linksToDelete.isEmpty()) {
+                ArrayList<TransientTask> links = linksToDelete.get(0).links;
+
+                while(!links.isEmpty()) { // removes any transient links from the anti task that is being deleted
+                    links.get(0).removeLinkedTo();
+                    System.out.println("\nTransient Task \"" + links.get(0).name + "\" link removed.");
+                    links.remove(0);
+                }
+
+                tasks.remove(linksToDelete.get(0));
+                System.out.println("\nAnti Task \"" + linksToDelete.get(0).name + "\" deleted with the Recurring Task.");
+                linksToDelete.remove(0);
             }
-            else {
-                if (candidatesForDeletion.size() > 1) {
-                    viewTask(name); // should print multiple tasks with the same name.
+        }
 
-                    System.out.println("\nAbove are the tasks with that name.");
-                    int date = Integer.parseInt(getDateInput("Input the date of the task you want deleted (mm/dd/yyyy): "));
+        if(!taskFound) {
+            System.out.println("\nTask not found.");
+        }
+        else {
+            if (candidatesForDeletion.size() > 1) {
+                viewTask(name); // should print multiple tasks with the same name.
 
-                    for (Task task : candidatesForDeletion) {
-                        if (task.date == date) {
-                            tasks.remove(task);
-                            isSaved = false;
-                        }
+                System.out.println("\nAbove are the tasks with that name.");
+                int date = Integer.parseInt(getDateInput("Input the date of the task you want deleted (mm/dd/yyyy): "));
+
+                for (Task task : candidatesForDeletion) {
+                    if (task.date == date) {
+                        tasks.remove(task);
+                        System.out.println("\nTask deleted.");
+                        isSaved = false;
                     }
                 }
-                else {
-                    tasks.remove(candidatesForDeletion.get(0));
-                    isSaved = false;
-                }
-
-                System.out.println("\nTask deleted.");
             }
+            else {
+                tasks.remove(candidatesForDeletion.get(0));
+                System.out.println("\nTask deleted.");
+                isSaved = false;
+            }
+        }  
     }
 
     /**
@@ -822,24 +832,33 @@ public class PSS {
      * @param name
      */
     public void editTask(String name) {
-        boolean exit = false;
-        boolean canChange;
+        boolean editing = true; // keeps the editing loop running
+        boolean canChange; // determines if the edit does not cause any conflicts
+        String recurringPrompt = "\nEdit Task\n"+
+                "\t1) Change Task Name\n"+
+                "\t2) Change Task Start Date\n"+
+                "\t3) Change Task Start Time\n"+
+                "\t4) Change Task Duration\n"+
+                "\t5) Change Task End Date\n"+
+                "\t6) Change Task Frequency\n"+
+                "\t7) Exit Editor\n"+ 
+                "Enter option: ";
+        String transientPrompt = "\nEdit Task\n"+
+                "\t1) Change Task Name\n"+
+                "\t2) Change Task Date\n"+
+                "\t3) Change Task Start Time\n"+
+                "\t4) Change Task Duration\n"+
+                "\t5) Exit Editor\n"+
+                "Enter option: ";
 
-        for(Task task : tasks) {
+        for(Task task : tasks) { // searches for the task that matches the name
             if(task.name.equals(name)) {
                 System.out.println("\n" + task.toString());
 
                 if(task.isTransient()) {
-                    while(!exit) {
+                    while(editing) {
                         canChange = false;
-
-                        System.out.print("\nEdit Task\n"+
-                                            "\t1) Change Task Name\n"+
-                                            "\t2) Change Task Date\n"+
-                                            "\t3) Change Task Start Time\n"+
-                                            "\t4) Change Task Duration\n"+
-                                            "\t5) Exit Editor\n"+
-                                            "Enter option: ");
+                        System.out.print(transientPrompt);
                         String option = kb.nextLine();
 
                         switch(option) {
@@ -858,7 +877,7 @@ public class PSS {
                                 break;
                             case "2":
                                 int oldDate = task.date;
-                                String newDate = getDateInput("Enter new date(hh:mm am/pm): ");
+                                String newDate = getDateInput("Enter new date(mm/dd/yyyy): ");
 
                                 if(!newDate.equals("")) {
                                     task.date = dateConversion(newDate);
@@ -902,7 +921,7 @@ public class PSS {
                                 }
                                 break;
                             case "5":
-                                exit = true;
+                                editing = false;
                                 break;
                             default: 
                                 System.out.println("\nInvaild Input");
@@ -920,18 +939,9 @@ public class PSS {
                 else if(task.isRecurring()) {
                     RecurringTask temp = (RecurringTask) task;
 
-                    while(!exit) {
+                    while(editing) {
                         canChange = false;
-
-                        System.out.print("\nEdit Task\n"+
-                                            "\t1) Change Task Name\n"+
-                                            "\t2) Change Task Start Date\n"+
-                                            "\t3) Change Task Start Time\n"+
-                                            "\t4) Change Task Duration\n"+
-                                            "\t5) Change Task End Date\n"+
-                                            "\t6) Change Task Frequency\n"+
-                                            "\t7) Exit Editor\n"+ 
-                                            "Enter option: ");
+                        System.out.print(recurringPrompt);
                         String option = kb.nextLine();
 
                         switch(option) {
@@ -1024,7 +1034,7 @@ public class PSS {
                                 }
                                 break;
                             case "7":
-                                exit = true;
+                                editing = false;
                                 break;
                             default: 
                                 System.out.println("\nInvaild Input");
@@ -1040,7 +1050,7 @@ public class PSS {
                     }
                 }
                 else {
-                    System.out.println("\nAntiTask cannot be edited.");
+                    System.out.println("\nAnti Task cannot be edited.");
                 }
 
                 return;
@@ -1269,6 +1279,10 @@ public class PSS {
         }
     }
 
+    /**
+     * Creates a schedule for a given day and writes it to a file
+     * @param username
+     */
     public void writeDaySchedule(String username) {
         String startDate = getDateInput("Enter date of tasks(mm/dd/yyyy): ");
 
@@ -1283,6 +1297,10 @@ public class PSS {
         writeSchedule(username, tasksInDay);
     }
 
+    /**
+     * Creates a schedule for a given week and writes it to a file
+     * @param username
+     */
     public void writeWeekSchedule(String username) {
         String startDate = getDateInput("Enter date of tasks(mm/dd/yyyy): ");
 
@@ -1297,6 +1315,10 @@ public class PSS {
         writeSchedule(username, tasksInWeek);
     }
 
+    /**
+     * Creates a schedulefor a given month and writes it to a file
+     * @param username
+     */
     public void writeMonthSchedule(String username) {
         String startDate = getDateInput("Enter date of tasks(mm/dd/yyyy): ");
 

@@ -9,10 +9,10 @@ public class TransientTask extends Task {
 
     /**
      * Links this transient task to an anti task
-     * @param a
+     * @param link
      */
-    public void linkTo(AntiTask a) {
-        linkedTo = a;
+    public void linkTo(AntiTask link) {
+        linkedTo = link;
     }
 
     /**

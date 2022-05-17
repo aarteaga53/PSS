@@ -6,15 +6,26 @@ public class Main {
 
     public static void main(String[] args) {
         boolean run = true;
-        User user = new User();
-        PSS pss = new PSS();
+        String loginPrompt = "\nChoose start option.\n\ta) Login\n\tb) Signup\n\tc) Exit\nEnter option: ";
+        String actionPrompt = "\nChoose PSS action.\n" +
+            "\ta) Create a task\n\tb) View a task\n\tc) Delete a task\n\td) Edit a task\n" +
+            "\te) Write schedule to a file\n\tf) Read schedule from a file\n" +
+            "\tg) View schedule for a day\n\th) View schedule for a week\n" +
+            "\ti) View schedule for a month\n\tj) Write schedule for a day\n" +
+            "\tk) Write schedule for a week\n\tl) Write schedule for a month\n" +
+            "\tm) Logout\n\tn) Exit\nEnter option: ";
         char option;
+
+        System.out.println("Welcome to PSS!");
 
         // Keeps the entire program running
         while(run) {
+            User user = new User();
+            PSS pss = new PSS();
+
             // Keeps the login/signup menu running
             while(user.username == null && run) {
-                option = getStartOption();
+                option = getOption('a', 'c', loginPrompt);
 
                 switch(option) {
                     case'a':
@@ -35,7 +46,7 @@ public class Main {
 
             // Keeps the pss actions menu running
             while(user.username != null && run) {
-                option = getActionOption();    
+                option = getOption('a', 'n', actionPrompt);    
 
                 switch(option) {
                     case'a':
@@ -78,8 +89,8 @@ public class Main {
                         pss.writeMonthSchedule(user.username); 
                         break;
                     case'm':
-                        pss = new PSS();
-                        user = new User();
+                        pss.exitWriteSchedule(user.username);
+                        user.username = null;
                         break;
                     case'n':
                         pss.exitWriteSchedule(user.username);
@@ -91,45 +102,22 @@ public class Main {
     }
 
     /**
-     * Gets user input for pss action
+     * Gets user input for option they would like to perform
+     * @param lower
+     * @param upper
+     * @param prompt
      * @return
      */
-    private static char getActionOption() {
+    private static char getOption(char lower, char upper, String prompt) {
         String option;
-        String prompt = "\nChoose PSS action.\n" +
-            "\ta) Create a task\n\tb) View a task\n" +
-            "\tc) Delete a task\n\td) Edit a task\n" +
-            "\te) Write schedule to a file\n\tf) Read schedule from a file\n" +
-            "\tg) View schedule for a day\n\th) View schedule for a week\n" +
-            "\ti) View schedule for a month\n\tj) Write schedule for a day\n" +
-            "\tk) Write schedule for a week\n\tl) Write schedule for a month\n" +
-            "\tm) Logout\n\tn) Exit\nEnter option: ";
 
         do {
             System.out.print(prompt);
             option = kb.nextLine();
 
-            if(!isOptionValid(option, 'a', 'n'))
+            if(!isOptionValid(option, lower, upper))
                 System.out.println("\nInvalid input.");
-        } while(!isOptionValid(option, 'a', 'n'));
-
-        return option.toLowerCase().charAt(0);
-    }
-
-    /**
-     * Gets user input for login option
-     * @return
-     */
-    private static char getStartOption() {
-        String option;
-
-        do {
-            System.out.print("Welcome to PSS!\n\ta) Login\n\tb) Signup\n\tc) Exit\nEnter option: ");
-            option = kb.nextLine();
-
-            if(!isOptionValid(option, 'a', 'c'))
-                System.out.println("\nInvalid input.\n");
-        } while(!isOptionValid(option, 'a', 'c'));
+        } while(!isOptionValid(option, lower, upper));
 
         return option.toLowerCase().charAt(0);
     }
