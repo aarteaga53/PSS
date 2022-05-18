@@ -123,7 +123,7 @@ public class User {
     private void addUser(String newUsername, String newPassword) {
         File file = new File("users.txt");
 
-        try {
+        try { // writes the new user to the users file
             FileWriter fw = new FileWriter(file, true);
             fw.append(newUsername + ":" + newPassword + "\n");
             fw.close();
@@ -146,7 +146,7 @@ public class User {
                 Path filePath = Paths.get("users.txt");
                 List<String> lines = Files.readAllLines(filePath);
     
-                for(String user : lines) {
+                for(String user : lines) { // enters the name as a key and password as the value
                     String[] split = user.split(":");
                     users.put(split[0], split[1]);
                 }
