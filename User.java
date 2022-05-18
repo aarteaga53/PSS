@@ -74,6 +74,7 @@ public class User {
         String newUsername;
         String newPassword;
         int attempts = 0;
+        boolean success = false;
 
         // gets username that must exist, 3 attempts are given to user
         do {
@@ -81,30 +82,32 @@ public class User {
             newUsername = kb.nextLine();
             attempts++;
 
-            if(!users.containsKey(newUsername)) {
+            success = users.containsKey(newUsername);
+            if(!success) {
                 System.out.println("\nUsername does not exist.\n");
             }
-        } while(!users.containsKey(newUsername));
+        } while(!success && attempts < 3);
 
-        if(attempts == 3) {
+        if(!success && attempts == 3) {
             System.out.println("\nToo many attempts.");
             return;
         }
 
+        success = false;
         attempts = 0;
-
         // gets password that must match username password, 3 attempts are given to user
         do {
             System.out.print("Enter password: ");
             newPassword = kb.nextLine();
             attempts++;
 
-            if(!users.get(newUsername).equals(newPassword)) {
+            success = users.get(newUsername).equals(newPassword);
+            if(!success) {
                 System.out.println("\nIncorrect password.\n");
             }
-        } while(!users.get(newUsername).equals(newPassword));
+        } while(!success && attempts < 3);
 
-        if(attempts == 3) {
+        if(!success && attempts == 3) {
             System.out.println("\nToo many attempts.");
             return;
         }
