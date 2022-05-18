@@ -82,7 +82,9 @@ public class PSS {
         do {
             System.out.print("Enter option: ");
             option = kb.nextLine();
-            count++;   
+            if(!isValid(lower, upper, option)) {
+                count++;
+            }
         } while(!isValid(lower, upper, option) && count < 3);
 
         if(count == 3) {
@@ -154,8 +156,9 @@ public class PSS {
             option = kb.nextLine();
             type = new Task(option);
 
-            if(!type.isRecurring() && !type.isTransient() && !type.isAnti())
+            if(!type.isRecurring() && !type.isTransient() && !type.isAnti()) {
                 System.out.println("\nInvalid input.\n");
+            }
         } while(!type.isRecurring() && !type.isTransient() && !type.isAnti());
 
         return option;
@@ -208,7 +211,10 @@ public class PSS {
         do {
             System.out.print(prompt);
             startTime = kb.nextLine();
-            count++;
+
+            if(!isStartTimeCorrect(startTime)) {
+                count++;
+            }
         } while(!isStartTimeCorrect(startTime) && count < 3);
 
         if(count == 3 && !isStartTimeCorrect(startTime)) {
@@ -232,7 +238,10 @@ public class PSS {
         do {
             System.out.print(prompt);
             duration = kb.nextLine();
-            count++;
+
+            if(!isDurationCorrect(duration)) {
+                count++;
+            }
         } while(!isDurationCorrect(duration) && count < 3);
 
         if(count == 3 && !isDurationCorrect(duration)) {
@@ -256,7 +265,10 @@ public class PSS {
         do {
             System.out.print(prompt);
             startDate = kb.nextLine();
-            count++;
+
+            if(!isDateCorrect(startDate)) {
+                count++;
+            }
         } while(!isDateCorrect(startDate) && count < 3);
 
         if(count == 3 && !isDateCorrect(startDate)) {
@@ -281,7 +293,10 @@ public class PSS {
         do {
             System.out.print(prompt);
             endDate = kb.nextLine();
-            count++;
+
+            if(!isEndDateCorrect(startDate, endDate)) {
+                count++;
+            }
         } while(!isEndDateCorrect(startDate, endDate) && count < 3);
 
         if(count == 3 && !isEndDateCorrect(startDate, endDate)) {
@@ -305,7 +320,11 @@ public class PSS {
         do {
             System.out.print(prompt);
             frequency = kb.nextLine();
-            count++;
+
+            if(!isFrequencyCorrect(frequency)) {
+                count++;
+
+            }
         } while(!isFrequencyCorrect(frequency) && count < 3);
 
         if(count == 3 && !isFrequencyCorrect(frequency)) {
@@ -1208,10 +1227,10 @@ public class PSS {
         do {
             System.out.print("Enter filename: ");
             filename = kb.nextLine();
-            count++;
 
             if(!filename.contains(".json")) {
                 System.out.println("\nMust be JSON file.");
+                count++;
             }
         } while(!filename.contains(".json") && count < 3);
 
