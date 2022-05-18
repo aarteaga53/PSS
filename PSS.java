@@ -443,34 +443,35 @@ public class PSS {
      * @return
      */
     private boolean conflicts(Task newTask) {
-        boolean recurringPresent = false;
-
         for(Task task : tasks) {
             if(newTask == task) {
                 continue;
             }
-            if(task.isRecurring()) {
-                recurringPresent = true;
-            }
-            if(!task.conflicts(newTask) && newTask.isAnti()) {
-                return false;
-            }
-            if(task.conflicts(newTask) && !newTask.isAnti()) {
-                if(newTask.isTransient()) {
-                    TransientTask t = (TransientTask) newTask;
-    
-                    if(t.isLinkedTo()) {
-                        AntiTask a = t.linkedTo;
-    
-                        a.removeLink(t);
+            if(newTask.isAnti()) {
+                if(task.isRecurring()) {
+                    if(!task.conflicts(newTask)) {
+                        return false;
                     }
                 }
-                return true;
+            }
+            else {
+                if(task.conflicts(newTask)) {
+                    if(newTask.isTransient()) {
+                        TransientTask t = (TransientTask) newTask;
+        
+                        if(t.isLinkedTo()) {
+                            AntiTask a = t.linkedTo;
+        
+                            a.removeLink(t);
+                        }
+                    }
+                    return true;
+                }
             }
         }
 
         // if no recurring tasks were found then anti cannot be created
-        if(newTask.isAnti() && !recurringPresent) {
+        if(newTask.isAnti()) {
             return true;
         }
             
