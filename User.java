@@ -36,13 +36,14 @@ public class User {
         do {
             System.out.print("Enter username: ");
             newUsername = kb.nextLine();
-            attempts++;
 
             if(newUsername.length() <= 1) {
                 System.out.println("\nUsername is too short.\n");
+                attempts++;
             }
             if(users.containsKey(newUsername)) {
                 System.out.println("\nUsername already exists.\n");
+                attempts++;
             }
         } while((users.containsKey(newUsername) || newUsername.length() <= 1) && attempts < 3);
 
@@ -57,9 +58,9 @@ public class User {
         do {
             System.out.print("Enter password: ");
             newPassword = kb.nextLine();
-            attempts++;
             if(newPassword.length() <= 1) {
                 System.out.println("\nPassword is too short.\n");
+                attempts++;
             }
         } while(newPassword.length() <= 1 && attempts < 3);
 
