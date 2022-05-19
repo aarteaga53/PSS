@@ -1,11 +1,3 @@
-// All accesses in the Task class have been replaced with getters and setters, if applicable.
-// All accesses to the Task class's members have also been replaced with getters and setters, if applicable.
-// It is not guaranteed that accesses to the members of other classes, like this one, are done through
-// getters and setters. Thank you for allowing us to stop replacing direct accesses with getters and setters after
-// one class, in response to my email.
-
-
-
 import java.util.ArrayList;
 
 public class RecurringTask extends Task implements Cloneable {
@@ -19,6 +11,26 @@ public class RecurringTask extends Task implements Cloneable {
         this.endDate = endDate;
         this.frequency = frequency;
         links = new ArrayList<>();
+    }
+
+    public int getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(int endDate) {
+        this.endDate = endDate;
+    }
+
+    public int getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(int frequency) {
+        this.frequency = frequency;
+    }
+
+    public ArrayList<AntiTask> getLinks() {
+        return links;
     }
 
     /**
@@ -42,7 +54,9 @@ public class RecurringTask extends Task implements Cloneable {
      * @param link
      */
     public void removeLink(AntiTask link) {
-        for(TransientTask t : link.links) {
+        ArrayList<TransientTask> alinks = link.getLinks();
+
+        for(TransientTask t : alinks) {
             t.removeLinkedTo();
         }
 
@@ -79,7 +93,7 @@ public class RecurringTask extends Task implements Cloneable {
                 //iterates through all days within the task time period and checks if there is any overlapping
                 while(next <= endDate && next <= task.getDate()) {
                     if(next == task.getDate()) {
-                        if((task.isAnti() && (task.getStartTime() == getStartTime() && task.getDuration() == getDuration())) && !hasLink(task)) {
+                        if((task.isAnti() && (task.getStartTime() == startTime && task.getDuration() == duration)) && !hasLink(task)) {
                             addLink((AntiTask) task);
                             return false;
                         }
@@ -177,17 +191,17 @@ public class RecurringTask extends Task implements Cloneable {
      * Converts the task to JSON
      */
     public String convertJSON() {
-        return "  {\n    \"Name\" : \"" + getName() + "\",\n" +
-                "    \"Type\" : \"" + getType() + "\",\n" +
-                "    \"StartDate\" : " + getDate() + ",\n" +
-                "    \"StartTime\" : " + getStartTime() + ",\n" +
-                "    \"Duration\" : " + getDuration() + ",\n" +
+        return "  {\n    \"Name\" : \"" + name + "\",\n" +
+                "    \"Type\" : \"" + type + "\",\n" +
+                "    \"StartDate\" : " + date + ",\n" +
+                "    \"StartTime\" : " + startTime + ",\n" +
+                "    \"Duration\" : " + duration + ",\n" +
                 "    \"EndDate\" : " + endDate + ",\n" +
                 "    \"Frequency\" : " + frequency + "\n  }";
     }
 
     public String toString() {
-        return getName() + "\n" + getType() + "\n" + timeConversion() + "\n" + durationConversion() + "\n" + dateConversion(getDate()) + "\n" + dateConversion(endDate) + "\n" + ((frequency == 1) ? "Daily" : "Weekly");
+        return name + "\n" + type + "\n" + timeConversion() + "\n" + durationConversion() + "\n" + dateConversion(date) + "\n" + dateConversion(endDate) + "\n" + ((frequency == 1) ? "Daily" : "Weekly");
     }
 
     @Override

@@ -1,23 +1,23 @@
-// All accesses in the Task class have been replaced with getters and setters, if applicable.
-// All accesses to the Task class's members have also been replaced with getters and setters, if applicable.
-// It is not guaranteed that accesses to the members of other classes, like this one, are done through
-// getters and setters. Thank you for allowing us to stop replacing direct accesses with getters and setters after
-// one class, in response to my email.
-
-
-
 import java.util.ArrayList;
 
 
 public class AntiTask extends Task implements Cloneable {
 
-    ArrayList<TransientTask> links;
     RecurringTask linkedTo;
+    ArrayList<TransientTask> links;
 
     public AntiTask(String name, String type, float startTime, float duration, int date) {
         super(name, type, date, startTime, duration);
         links = new ArrayList<>();
         linkedTo = null;
+    }
+
+    public RecurringTask getLinkedTo() {
+        return linkedTo;
+    }
+
+    public ArrayList<TransientTask> getLinks() {
+        return links;
     }
 
     /**
@@ -46,7 +46,7 @@ public class AntiTask extends Task implements Cloneable {
         }
         else {
             System.out.println("Warning: AntiTask's remove link tried" +
-                                " to remove a link that wasn't in the list");
+                            " to remove a link that wasn't in the list");
         }
     }
 
@@ -78,7 +78,7 @@ public class AntiTask extends Task implements Cloneable {
      * Checks if there any conflicts
      */
     public boolean conflicts(Task task) {
-        if(task.getDate() == getDate() && overlaps(task)) {
+        if(task.getDate() == date && overlaps(task)) {
             if(task.isTransient() && !hasLink(task)) {
                 if(!links.contains(task)) {
                     addLink((TransientTask) task);
@@ -90,10 +90,6 @@ public class AntiTask extends Task implements Cloneable {
         }
 
         return false;
-    }
-
-    public String toString() {
-        return getName() + "\n" + getType() + "\n" + timeConversion() + "\n" + durationConversion() + "\n" + dateConversion(getDate());
     }
 
     @Override

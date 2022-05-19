@@ -1,11 +1,3 @@
-// All accesses in the Task class have been replaced with getters and setters, if applicable.
-// All accesses to the Task class's members have also been replaced with getters and setters, if applicable.
-// It is not guaranteed that accesses to the members of other classes, like this one, are done through
-// getters and setters. Thank you for allowing us to stop replacing direct accesses with getters and setters after
-// one class, in response to my email.
-
-
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -22,6 +14,14 @@ public class User {
     private Scanner kb = new Scanner(System.in);
     String username;
     String password;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
     /**
      * Prompts user to signup with username and password 
@@ -48,7 +48,7 @@ public class User {
         } while((users.containsKey(newUsername) || newUsername.length() <= 1) && attempts < 3);
 
         if(attempts == 3) {
-            System.out.println("Too many attempts.\n");
+            System.out.println("Too many attempts.");
             return;
         }
         
@@ -58,6 +58,7 @@ public class User {
         do {
             System.out.print("Enter password: ");
             newPassword = kb.nextLine();
+
             if(newPassword.length() <= 1) {
                 System.out.println("\nPassword is too short.\n");
                 attempts++;
@@ -65,7 +66,7 @@ public class User {
         } while(newPassword.length() <= 1 && attempts < 3);
 
         if(attempts == 3) {
-            System.out.println("Too many attempts.\n");
+            System.out.println("Too many attempts.");
             return;
         }
 
@@ -95,7 +96,7 @@ public class User {
         } while(!users.containsKey(newUsername) && attempts < 3);
 
         if(attempts == 3) {
-            System.out.println("\nToo many attempts.");
+            System.out.println("Too many attempts.");
             return;
         }
 
@@ -113,7 +114,7 @@ public class User {
         } while(!users.get(newUsername).equals(newPassword) && attempts < 3);
 
         if(attempts == 3) {
-            System.out.println("\nToo many attempts.");
+            System.out.println("Too many attempts.");
             return;
         }
 

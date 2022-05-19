@@ -1,4 +1,3 @@
-
 public class Task implements Comparable<Task> {
 
     String name;
@@ -8,15 +7,55 @@ public class Task implements Comparable<Task> {
     float duration;
 
     public Task(String type) {
-        this.setType(type);
+        this.type = type;
     }
 
     public Task(String name, String type, int date, float startTime, float duration) {
-        this.setName(name);
-        this.setType(type);
-        this.setDate(date);
-        this.setStartTime(startTime);
-        this.setDuration(duration);
+        this.name = name;
+        this.type = type;
+        this.date = date;
+        this.startTime = startTime;
+        this.duration = duration;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public int getDate() {
+        return date;
+    }
+
+    public void setDate(int date) {
+        this.date = date;
+    }
+
+    public float getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(float startTime) {
+        this.startTime = startTime;
+    }
+
+    public float getDuration() {
+        return duration;
+    }
+
+    public void setDuration(float duration) {
+        this.duration = duration;
     }
 
     /**
@@ -24,7 +63,7 @@ public class Task implements Comparable<Task> {
      * @return
      */
     public boolean isAnti() {
-        boolean isAnti = getType().equals("Cancellation");
+        boolean isAnti = type.equals("Cancellation");
 
         return isAnti;
     }
@@ -34,13 +73,13 @@ public class Task implements Comparable<Task> {
      * @return
      */
     public boolean isTransient() {
-        boolean isTransient = getType().equals("Visit") || 
-        getType().equals("Shopping") || getType().equals("Appointment");
+        boolean isTransient = type.equals("Visit") || 
+        type.equals("Shopping") || type.equals("Appointment");
 
-        if(getName() != null) {
+        if(name != null) {
             try {
                 TransientTask temp = (TransientTask) this;
-                temp.setName(getName());
+                temp.setName(name);
                 isTransient = true;
             } catch(ClassCastException e) {
                 isTransient = false;
@@ -55,15 +94,15 @@ public class Task implements Comparable<Task> {
      * @return
      */
     public boolean isRecurring() {
-        boolean isRecurring = getType().equals("Class") ||
-        getType().equals("Study") || getType().equals("Sleep") ||
-        getType().equals("Sleep") || getType().equals("Exercise") ||
-        getType().equals("Work") || getType().equals("Meal");
+        boolean isRecurring = type.equals("Class") ||
+        type.equals("Study") || type.equals("Sleep") ||
+        type.equals("Sleep") || type.equals("Exercise") ||
+        type.equals("Work") || type.equals("Meal");
 
-        if(getName() != null) {
+        if(name != null) {
             try {
                 RecurringTask temp = (RecurringTask) this;
-                temp.setName(getName());
+                temp.setName(name);
                 isRecurring = true;
             } catch(ClassCastException e) {
                 isRecurring = false;
@@ -89,8 +128,8 @@ public class Task implements Comparable<Task> {
      */
     public String durationConversion() {
         String dur = "";
-        int hour = (int) getDuration();
-        float minute = getDuration() - hour;
+        int hour = (int) duration;
+        float minute = duration - hour;
 
         if(minute == 0) {
             dur = ":00";
@@ -114,8 +153,8 @@ public class Task implements Comparable<Task> {
      */
     public String timeConversion() {
         String time = "";
-        int hour = (int) getStartTime();
-        float minute = getStartTime() - hour;
+        int hour = (int) startTime;
+        float minute = startTime - hour;
 
         if(minute == 0) {
             time = ":00 ";
@@ -155,7 +194,7 @@ public class Task implements Comparable<Task> {
         if(task.isRecurring()) {
             return task.conflicts(this);
         }
-        if(task.getDate() == getDate()) {
+        if(task.getDate() == date) {
             return overlaps(task);
         }
 
@@ -168,13 +207,13 @@ public class Task implements Comparable<Task> {
      * @return
      */
     public boolean overlaps(Task task) {
-        if(task.getStartTime() == getStartTime()) {
+        if(task.getStartTime() == startTime) {
             return true;
         }
-        else if(task.getStartTime() < getStartTime() && task.getStartTime() + task.getDuration() > getStartTime()) {
+        else if(task.getStartTime() < startTime && task.getStartTime() + task.getDuration() > startTime) {
             return true;
         }
-        else if(task.getStartTime() > getStartTime() && getStartTime() + getDuration() > task.getStartTime()) {
+        else if(task.getStartTime() > startTime && startTime + duration > task.getStartTime()) {
             return true;
         }
 
@@ -186,15 +225,15 @@ public class Task implements Comparable<Task> {
      * @return  String of task in JSON
      */
     public String convertJSON() {
-        return "  {\n    \"Name\" : \"" + getName() + "\",\n" +
-                "    \"Type\" : \"" + getType() + "\",\n" +
-                "    \"Date\" : " + getDate() + ",\n" +
-                "    \"StartTime\" : " + getStartTime() + ",\n" +
-                "    \"Duration\" : " + getDuration() + "\n  }";
+        return "  {\n    \"Name\" : \"" + name + "\",\n" +
+                "    \"Type\" : \"" + type + "\",\n" +
+                "    \"Date\" : " + date + ",\n" +
+                "    \"StartTime\" : " + startTime + ",\n" +
+                "    \"Duration\" : " + duration + "\n  }";
     }
 
     public String toString() {
-        return getName() + "\n" + getType() + "\n" + timeConversion() + "\n" + durationConversion();
+        return name + "\n" + type + "\n" + timeConversion() + "\n" + durationConversion() + "\n" + dateConversion(date);
     }
 
     /**
@@ -208,56 +247,15 @@ public class Task implements Comparable<Task> {
      */
     public int compareTo(Task taskOther) {
         //System.out.println("compareTo() is not meant to be supported by the Task class");
-        if (getStartTime() < taskOther.getStartTime()) {
+        if (startTime < taskOther.getStartTime()) {
             return -1;
         }
-        else if (getStartTime() == taskOther.getStartTime()) {
+        else if (startTime == taskOther.getStartTime()) {
             return 0;
         }
         else {
             return 1;
         }
-    }
-
-
-    public String getName() {
-        return this.name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getType() {
-        return this.type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public int getDate() {
-        return this.date;
-    }
-
-    public void setDate(int date) {
-        this.date = date;
-    }
-
-    public float getStartTime() {
-        return this.startTime;
-    }
-
-    public void setStartTime(float startTime) {
-        this.startTime = startTime;
-    }
-
-    public float getDuration() {
-        return this.duration;
-    }
-
-    public void setDuration(float duration) {
-        this.duration = duration;
     }
     
 }

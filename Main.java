@@ -1,11 +1,3 @@
-// All accesses in the Task class have been replaced with getters and setters, if applicable.
-// All accesses to the Task class's members have also been replaced with getters and setters, if applicable.
-// It is not guaranteed that accesses to the members of other classes, like this one, are done through
-// getters and setters. Thank you for allowing us to stop replacing direct accesses with getters and setters after
-// one class, in response to my email.
-
-
-
 import java.util.Scanner;
 
 public class Main {
@@ -13,7 +5,7 @@ public class Main {
     private static Scanner kb = new Scanner(System.in);
 
     public static void main(String[] args) {
-        boolean run = true;
+        boolean running = true;
         String loginPrompt = "\nChoose start option.\n\ta) Login\n\tb) Signup\n\tc) Exit\nEnter option: ";
         String actionPrompt = "\nChoose PSS action.\n" +
             "\ta) Create a task\n\tb) View a task\n\tc) Delete a task\n\td) Edit a task\n" +
@@ -27,12 +19,12 @@ public class Main {
         System.out.println("Welcome to PSS!");
 
         // Keeps the entire program running
-        while(run) {
+        while(running) {
             User user = new User();
             PSS pss = new PSS();
 
             // Keeps the login/signup menu running
-            while(user.username == null && run) {
+            while(user.getUsername() == null && running) {
                 option = getOption('a', 'c', loginPrompt);
 
                 switch(option) {
@@ -43,17 +35,17 @@ public class Main {
                         user.signup();
                         break;
                     case'c':
-                        run = false;
+                    running = false;
                         break;
                 }
             }
 
-            if(user.username != null && run) {
-                pss.loadSchedule(user.username);
+            if(user.getUsername() != null && running) {
+                pss.loadSchedule(user.getUsername());
             }
 
             // Keeps the pss actions menu running
-            while(user.username != null && run) {
+            while(user.getUsername() != null && running) {
                 option = getOption('a', 'n', actionPrompt);    
 
                 switch(option) {
@@ -73,10 +65,10 @@ public class Main {
                         pss.editTask(kb.nextLine());
                         break;
                     case'e':
-                        pss.writeSchedule(user.username);
+                        pss.writeSchedule(user.getUsername());
                         break;
                     case'f':
-                        pss.readSchedule(user.username);
+                        pss.readSchedule(user.getUsername());
                         break;
                     case'g':
                         pss.daySchedule();
@@ -88,21 +80,21 @@ public class Main {
                         pss.monthSchedule();
                         break;
                     case'j':
-                        pss.writeDaySchedule(user.username);
+                        pss.writeDaySchedule(user.getUsername());
                         break;
                     case'k':
-                        pss.writeWeekSchedule(user.username);
+                        pss.writeWeekSchedule(user.getUsername());
                         break;
                     case'l':
-                        pss.writeMonthSchedule(user.username); 
+                        pss.writeMonthSchedule(user.getUsername()); 
                         break;
                     case'm':
-                        pss.exitWriteSchedule(user.username);
-                        user.username = null;
+                        pss.exitWriteSchedule(user.getUsername());
+                        user.setUsername(null);
                         break;
                     case'n':
-                        pss.exitWriteSchedule(user.username);
-                        run = false;
+                        pss.exitWriteSchedule(user.getUsername());
+                        running = false;
                         break;
                 }
             }

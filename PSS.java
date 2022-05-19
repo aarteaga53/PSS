@@ -1,11 +1,3 @@
-// All accesses in the Task class have been replaced with getters and setters, if applicable.
-// All accesses to the Task class's members have also been replaced with getters and setters, if applicable.
-// It is not guaranteed that accesses to the members of other classes, like this one, are done through
-// getters and setters. Thank you for allowing us to stop replacing direct accesses with getters and setters after
-// one class, in response to my email.
-
-
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -468,7 +460,7 @@ public class PSS {
                     TransientTask t = (TransientTask) newTask;
     
                     if(t.isLinkedTo()) {
-                        AntiTask a = t.linkedTo;
+                        AntiTask a = t.getLinkedTo();
     
                         a.removeLink(t);
                     }
@@ -762,12 +754,12 @@ public class PSS {
                 if(task.isAnti()) {
                     AntiTask temp = (AntiTask) task;
 
-                    if(temp.links.size() > 0) { // checks if there are any transient tasks that depend on this anti task
+                    if(temp.getLinks().size() > 0) { // checks if there are any transient tasks that depend on this anti task
                         System.out.println("\nTask could not be removed.");
                         return;
                     }
                     else { // removes any links to a recurring task
-                        RecurringTask link = temp.linkedTo;
+                        RecurringTask link = temp.getLinkedTo();
 
                         System.out.println("\nTransient Task \"" + link.getName() + "\" link removed.");
                         link.removeLink(temp);
@@ -776,12 +768,12 @@ public class PSS {
                 }
                 else if(task.isRecurring()) { // removes any anti tasks that are linked to this recurring task
                     RecurringTask temp = (RecurringTask) task;
-                    linksToDelete = temp.links;
+                    linksToDelete = temp.getLinks();
                     isSaved = false;
                 }
                 else if(task.isTransient()) { // removes a link to anti task if there is one
                     TransientTask temp = (TransientTask) task;
-                    AntiTask link = temp.linkedTo;
+                    AntiTask link = temp.getLinkedTo();
 
                     if (link != null) {
                         System.out.println("\nAnti Task \"" + link.getName() + "\" link removed.");
@@ -796,7 +788,7 @@ public class PSS {
 
         if(!linksToDelete.isEmpty()) { // deletes any anti tasks that were linked to a recurring task
             while(!linksToDelete.isEmpty()) {
-                ArrayList<TransientTask> links = linksToDelete.get(0).links;
+                ArrayList<TransientTask> links = linksToDelete.get(0).getLinks();
 
                 while(!links.isEmpty()) { // removes any transient links from the anti task that is being deleted
                     links.get(0).removeLinkedTo();
@@ -1014,14 +1006,14 @@ public class PSS {
                                 }
                                 break;
                             case "5":
-                                int oldEnd = temp.endDate;
+                                int oldEnd = temp.getEndDate();
                                 String newEnd = getEndDateInput("Enter new end date(mm/dd/yyyy): ", temp.dateConversion(temp.getDate()));
 
                                 if(!newEnd.equals("")) {
-                                    temp.endDate = dateConversion(newEnd);
+                                    temp.setEndDate(dateConversion(newEnd));
                                 }
                                 if(conflicts(task)) {
-                                    temp.endDate = oldEnd;
+                                    temp.setEndDate(oldEnd);
                                     System.out.println("\nConflicts Detected. Changes not saved.");
                                 }
                                 else{
@@ -1029,14 +1021,14 @@ public class PSS {
                                 }
                                 break;
                             case "6":
-                                int oldFreq = temp.frequency;
+                                int oldFreq = temp.getFrequency();
                                 String newFreq = getFrequencyInput("Enter new frequency(1/7): ");
 
                                 if(!newFreq.equals("")) {
-                                    temp.frequency = Integer.parseInt(newFreq);
+                                    temp.setFrequency(Integer.parseInt(newFreq));
                                 }
                                 if(conflicts(task)) {
-                                    temp.frequency = oldFreq;
+                                    temp.setFrequency(oldFreq);
                                     System.out.println("\nConflicts Detected. Changes not saved.");
                                 }
                                 else {
@@ -1077,7 +1069,7 @@ public class PSS {
      * @param task
      */
     private void removeRecurringLink(RecurringTask task) {
-        ArrayList<AntiTask> a = task.links;
+        ArrayList<AntiTask> a = task.getLinks();
         int aSize = a.size();
         int aCount = 0;
         int aIndex = 0;
@@ -1086,8 +1078,8 @@ public class PSS {
             int next = task.getDate();
 
             // gets all dates within the recurring task and compares to the anti task
-            while(next <= task.endDate) {
-                next = task.nextDate(next, task.frequency);
+            while(next <= task.getEndDate()) {
+                next = task.nextDate(next, task.getFrequency());
 
                 if(next == a.get(aIndex).getDate()) {
                     break;
@@ -1095,8 +1087,8 @@ public class PSS {
             }
 
             // if the anti task date still aligns with a date in recurring task, it gets updated
-            if(next <= task.endDate) {
-                ArrayList<TransientTask> t = a.get(aIndex).links;
+            if(next <= task.getEndDate()) {
+                ArrayList<TransientTask> t = a.get(aIndex).getLinks();
                 int tSize = t.size();
                 int tCount = 0;
                 int tIndex = 0;
@@ -1137,7 +1129,7 @@ public class PSS {
      */
     private void removeTransientLink(TransientTask task) {
         if(task.isLinkedTo()) {
-            AntiTask anti = task.linkedTo;
+            AntiTask anti = task.getLinkedTo();
 
             if(task.getDate() != anti.getDate() || !anti.overlaps(task)) {
                 System.out.println("\nAntiTask \"" + anti.getName() + "\" no longer linked to TransientTask \"" + task.getName() + "\".");
@@ -1364,7 +1356,7 @@ public class PSS {
 
             next = day.nextDate(next, 1);
             day.setDate(next);
-            day.endDate = next;
+            day.setEndDate(next);
             count++;
         }
 
@@ -1386,9 +1378,10 @@ public class PSS {
                 if(task.isRecurring()) {
                     RecurringTask temp = (RecurringTask) task;
                     TransientTask t = new TransientTask(temp.getName(), temp.getType(), temp.getStartTime(), temp.getDuration(), day.getDate());
+                    ArrayList<AntiTask> links = temp.getLinks();
 
-                    if(temp.links.size() > 0) {
-                        for(AntiTask a : temp.links) {
+                    if(links.size() > 0) {
+                        for(AntiTask a : links) {
                             if(!day.conflicts(a)) {
                                 tasksInDay.add(t);
                             }
@@ -1405,43 +1398,6 @@ public class PSS {
         }
 
         return tasksInDay;
-    }
-
-
-    public Scanner getKb() {
-        return this.kb;
-    }
-
-    public void setKb(Scanner kb) {
-        this.kb = kb;
-    }
-
-    public ArrayList<Task> getTasks() {
-        return this.tasks;
-    }
-
-    public void setTasks(ArrayList<Task> tasks) {
-        this.tasks = tasks;
-    }
-
-    public DataFile getDataFile() {
-        return this.dataFile;
-    }
-
-    public void setDataFile(DataFile dataFile) {
-        this.dataFile = dataFile;
-    }
-
-    public boolean isIsSaved() {
-        return this.isSaved;
-    }
-
-    public boolean getIsSaved() {
-        return this.isSaved;
-    }
-
-    public void setIsSaved(boolean isSaved) {
-        this.isSaved = isSaved;
     }
 
 }
