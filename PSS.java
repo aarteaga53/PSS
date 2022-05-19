@@ -1,3 +1,11 @@
+// All accesses in the Task class have been replaced with getters and setters, if applicable.
+// All accesses to the Task class's members have also been replaced with getters and setters, if applicable.
+// It is not guaranteed that accesses to the members of other classes, like this one, are done through
+// getters and setters. Thank you for allowing us to stop replacing direct accesses with getters and setters after
+// one class, in response to my email.
+
+
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -650,6 +658,7 @@ public class PSS {
     private int dateConversion(String date) {
         String[] split = date.split("/");
         return Integer.parseInt(split[2] + split[0] + split[1]);
+        
     }
 
     /**
@@ -713,7 +722,7 @@ public class PSS {
      */
     private boolean uniqueName(String name) {
         for(Task task : tasks) {
-            if(task.name.equals(name))
+            if(task.getName().equals(name))
                 return false;
         } 
 
@@ -728,7 +737,7 @@ public class PSS {
         boolean taskFound = false;
 
         for(Task task : tasks) {
-            if(task.name.equals(name)) {
+            if(task.getName().equals(name)) {
                 System.out.println("\n" + task.toString());
                 taskFound = true;
             }
@@ -749,7 +758,7 @@ public class PSS {
         ArrayList<AntiTask> linksToDelete = new ArrayList<>();
 
         for(Task task : tasks) {
-            if(task.name.equals(name)) {
+            if(task.getName().equals(name)) {
                 if(task.isAnti()) {
                     AntiTask temp = (AntiTask) task;
 
@@ -760,7 +769,7 @@ public class PSS {
                     else { // removes any links to a recurring task
                         RecurringTask link = temp.linkedTo;
 
-                        System.out.println("\nTransient Task \"" + link.name + "\" link removed.");
+                        System.out.println("\nTransient Task \"" + link.getName() + "\" link removed.");
                         link.removeLink(temp);
                         isSaved = false;
                     }          
@@ -775,7 +784,7 @@ public class PSS {
                     AntiTask link = temp.linkedTo;
 
                     if (link != null) {
-                        System.out.println("\nAnti Task \"" + link.name + "\" link removed.");
+                        System.out.println("\nAnti Task \"" + link.getName() + "\" link removed.");
                         link.removeLink(temp);
                     }
                 }
@@ -791,12 +800,12 @@ public class PSS {
 
                 while(!links.isEmpty()) { // removes any transient links from the anti task that is being deleted
                     links.get(0).removeLinkedTo();
-                    System.out.println("\nTransient Task \"" + links.get(0).name + "\" link removed.");
+                    System.out.println("\nTransient Task \"" + links.get(0).getName() + "\" link removed.");
                     links.remove(0);
                 }
 
                 tasks.remove(linksToDelete.get(0));
-                System.out.println("\nAnti Task \"" + linksToDelete.get(0).name + "\" deleted with the Recurring Task.");
+                System.out.println("\nAnti Task \"" + linksToDelete.get(0).getName() + "\" deleted with the Recurring Task.");
                 linksToDelete.remove(0);
             }
         }
@@ -809,10 +818,11 @@ public class PSS {
                 viewTask(name); // should print multiple tasks with the same name.
 
                 System.out.println("\nAbove are the tasks with that name.");
-                int date = Integer.parseInt(getDateInput("Input the date of the task you want deleted (mm/dd/yyyy): "));
+                String dateInput = getDateInput("Input the date of the task you want deleted (mm/dd/yyyy): ");
+                int date = dateConversion(dateInput);
 
                 for (Task task : candidatesForDeletion) {
-                    if (task.date == date) {
+                    if (task.getDate() == date) {
                         tasks.remove(task);
                         System.out.println("\nTask deleted.");
                         isSaved = false;
@@ -852,7 +862,7 @@ public class PSS {
                 "Enter option: ";
 
         for(Task task : tasks) { // searches for the task that matches the name
-            if(task.name.equals(name)) {
+            if(task.getName().equals(name)) {
                 System.out.println("\n" + task.toString());
 
                 if(task.isTransient()) {
@@ -866,7 +876,7 @@ public class PSS {
                                 String newName = getNameInput("Enter new name: ");
                                 
                                 if(!newName.equals("")) {
-                                    task.name = newName;
+                                    task.setName(newName);
                                     isSaved = false;
 
                                     System.out.println("\nChanges Saved.");
@@ -876,14 +886,14 @@ public class PSS {
                                 }
                                 break;
                             case "2":
-                                int oldDate = task.date;
+                                int oldDate = task.getDate();
                                 String newDate = getDateInput("Enter new date(mm/dd/yyyy): ");
 
                                 if(!newDate.equals("")) {
-                                    task.date = dateConversion(newDate);
+                                    task.setDate(dateConversion(newDate));
                                 }
                                 if(conflicts(task)) {
-                                    task.date = oldDate;
+                                    task.setDate(oldDate);
                                     System.out.println("\nConflicts Detected. Changes not saved.");
                                 }
                                 else {
@@ -891,14 +901,14 @@ public class PSS {
                                 }
                                 break;
                             case "3":
-                                float oldTime = task.startTime;
+                                float oldTime = task.getStartTime();
                                 String newTime = getStartTimeInput("Enter new start time(hh:mm am/pm): ");
 
                                 if(!newTime.equals("")) {
-                                    task.startTime = timeConversion(newTime);
+                                    task.setStartTime(timeConversion(newTime));
                                 }
                                 if(conflicts(task)) {
-                                    task.startTime = oldTime;
+                                    task.setStartTime(oldTime);
                                     System.out.println("\nConflicts Detected. Changes not saved.");
                                 }
                                 else {
@@ -906,14 +916,14 @@ public class PSS {
                                 }
                                 break;
                             case "4":
-                                float oldDuration = task.duration;
+                                float oldDuration = task.getDuration();
                                 String newDuration = getDurationInput("Enter new duration(hh:mm): ");
 
                                 if(!newDuration.equals("")) {
-                                    task.duration = durationConversion(newDuration);
+                                    task.setDuration(durationConversion(newDuration));
                                 }
                                 if(conflicts(task)) {
-                                    task.duration = oldDuration;
+                                    task.setDuration(oldDuration);
                                     System.out.println("\nConflicts Detected. Changes not saved.");
                                 }
                                 else {
@@ -949,7 +959,7 @@ public class PSS {
                                 String newName = getNameInput("Enter new name: ");
                                     
                                 if(!newName.equals("")) {
-                                    task.name = newName;
+                                    task.setName(newName);
                                     isSaved = false;
 
                                     System.out.println("\nChanges Saved.");
@@ -959,14 +969,14 @@ public class PSS {
                                 }
                                 break;
                             case "2":
-                                int oldDate = task.date;
+                                int oldDate = task.getDate();
                                 String newDate = getDateInput("Enter new date(mm/dd/yyyy): ");
 
                                 if(!newDate.equals("")) {
-                                    task.date = dateConversion(newDate);
+                                    task.setDate(dateConversion(newDate));
                                 }
                                 if(conflicts(task)) {
-                                    task.date = oldDate;
+                                    task.setDate(oldDate);
                                     System.out.println("\nConflicts Detected. Changes not saved.");
                                 }
                                 else {
@@ -974,14 +984,14 @@ public class PSS {
                                 }
                                 break;
                             case "3":
-                                float oldTime = task.startTime;
+                                float oldTime = task.getStartTime();
                                 String newTime = getStartTimeInput("Enter new start time(hh:mm am/pm): ");
 
                                 if(!newTime.equals("")) {
-                                    task.startTime = timeConversion(newTime);
+                                    task.setStartTime(timeConversion(newTime));
                                 }
                                 if(conflicts(task)) {
-                                    task.startTime = oldTime;
+                                    task.setStartTime(oldTime);
                                     System.out.println("\nConflicts Detected. Changes not saved.");
                                 }
                                 else {
@@ -989,14 +999,14 @@ public class PSS {
                                 }
                                 break;
                             case "4":
-                                float oldDuration = task.duration;
+                                float oldDuration = task.getDuration();
                                 String newDuration = getDurationInput("Enter new duration(hh:mm): ");
 
                                 if(!newDuration.equals("")) {
-                                    task.duration = durationConversion(newDuration);
+                                    task.setDuration(durationConversion(newDuration));
                                 }
                                 if(conflicts(task)) {
-                                    task.duration = oldDuration;
+                                    task.setDuration(oldDuration);
                                     System.out.println("\nConflicts Detected. Changes not saved.");
                                 }
                                 else {
@@ -1005,7 +1015,7 @@ public class PSS {
                                 break;
                             case "5":
                                 int oldEnd = temp.endDate;
-                                String newEnd = getEndDateInput("Enter new end date(mm/dd/yyyy): ", temp.dateConversion(temp.date));
+                                String newEnd = getEndDateInput("Enter new end date(mm/dd/yyyy): ", temp.dateConversion(temp.getDate()));
 
                                 if(!newEnd.equals("")) {
                                     temp.endDate = dateConversion(newEnd);
@@ -1073,13 +1083,13 @@ public class PSS {
         int aIndex = 0;
 
         while(!a.isEmpty() && aCount < aSize) {
-            int next = task.date;
+            int next = task.getDate();
 
             // gets all dates within the recurring task and compares to the anti task
             while(next <= task.endDate) {
                 next = task.nextDate(next, task.frequency);
 
-                if(next == a.get(aIndex).date) {
+                if(next == a.get(aIndex).getDate()) {
                     break;
                 }
             }
@@ -1091,15 +1101,15 @@ public class PSS {
                 int tCount = 0;
                 int tIndex = 0;
                 
-                a.get(aIndex).startTime = task.startTime;
-                a.get(aIndex).duration = task.duration;
+                a.get(aIndex).setStartTime(task.getStartTime());
+                a.get(aIndex).setDuration(task.getDuration());
 
-                System.out.println("\nAntiTask \"" + a.get(aIndex).name + "\" updated.");
+                System.out.println("\nAntiTask \"" + a.get(aIndex).getName() + "\" updated.");
 
                 while(!t.isEmpty() && tCount < tSize) {
                     // checks if any transient tasks no longer conflict with the updated anti task
-                    if(a.get(aIndex).date != t.get(tIndex).date || !a.get(aIndex).overlaps(t.get(tIndex))) {
-                        System.out.println("\nAntiTask \"" + a.get(aIndex).name + "\" no longer linked to TransientTask \"" + t.get(tIndex).name + "\".");
+                    if(a.get(aIndex).getDate() != t.get(tIndex).getDate() || !a.get(aIndex).overlaps(t.get(tIndex))) {
+                        System.out.println("\nAntiTask \"" + a.get(aIndex).getName() + "\" no longer linked to TransientTask \"" + t.get(tIndex).getName() + "\".");
                         a.get(aIndex).removeLink(t.get(tIndex));
                     }
                     else {
@@ -1112,7 +1122,7 @@ public class PSS {
                 aIndex++;
             }
             else {
-                System.out.println("\nAntiTask \"" + a.get(aIndex).name + "\" was deleted.");
+                System.out.println("\nAntiTask \"" + a.get(aIndex).getName() + "\" was deleted.");
                 tasks.remove(a.get(aIndex));
                 task.removeLink(a.get(aIndex));
             }
@@ -1129,8 +1139,8 @@ public class PSS {
         if(task.isLinkedTo()) {
             AntiTask anti = task.linkedTo;
 
-            if(task.date != anti.date || !anti.overlaps(task)) {
-                System.out.println("\nAntiTask \"" + anti.name + "\" no longer linked to TransientTask \"" + task.name + "\".");
+            if(task.getDate() != anti.getDate() || !anti.overlaps(task)) {
+                System.out.println("\nAntiTask \"" + anti.getName() + "\" no longer linked to TransientTask \"" + task.getName() + "\".");
                 anti.removeLink(task);
             }
         }
@@ -1153,6 +1163,7 @@ public class PSS {
     public void writeSchedule(String username, List<Task> schedule) {
         String filepath = username + "/";
         String filename = getFilename();
+        Collections.sort(schedule);
 
         if(filename.equals("")) {
             return;
@@ -1188,6 +1199,7 @@ public class PSS {
         // checks if the file exists
         if(new File(filepath + filename).exists()) {
             dataFile.read(tasks, filepath + filename);
+            Collections.sort(tasks);
             System.out.println("\nSchedule read.");
         }
         else {
@@ -1351,7 +1363,7 @@ public class PSS {
             }
 
             next = day.nextDate(next, 1);
-            day.date = next;
+            day.setDate(next);
             day.endDate = next;
             count++;
         }
@@ -1373,7 +1385,7 @@ public class PSS {
             if (day.conflicts(task)) {
                 if(task.isRecurring()) {
                     RecurringTask temp = (RecurringTask) task;
-                    TransientTask t = new TransientTask(temp.name, temp.type, temp.startTime, temp.duration, day.date);
+                    TransientTask t = new TransientTask(temp.getName(), temp.getType(), temp.getStartTime(), temp.getDuration(), day.getDate());
 
                     if(temp.links.size() > 0) {
                         for(AntiTask a : temp.links) {
@@ -1393,6 +1405,43 @@ public class PSS {
         }
 
         return tasksInDay;
+    }
+
+
+    public Scanner getKb() {
+        return this.kb;
+    }
+
+    public void setKb(Scanner kb) {
+        this.kb = kb;
+    }
+
+    public ArrayList<Task> getTasks() {
+        return this.tasks;
+    }
+
+    public void setTasks(ArrayList<Task> tasks) {
+        this.tasks = tasks;
+    }
+
+    public DataFile getDataFile() {
+        return this.dataFile;
+    }
+
+    public void setDataFile(DataFile dataFile) {
+        this.dataFile = dataFile;
+    }
+
+    public boolean isIsSaved() {
+        return this.isSaved;
+    }
+
+    public boolean getIsSaved() {
+        return this.isSaved;
+    }
+
+    public void setIsSaved(boolean isSaved) {
+        this.isSaved = isSaved;
     }
 
 }

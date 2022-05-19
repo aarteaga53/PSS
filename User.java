@@ -1,3 +1,11 @@
+// All accesses in the Task class have been replaced with getters and setters, if applicable.
+// All accesses to the Task class's members have also been replaced with getters and setters, if applicable.
+// It is not guaranteed that accesses to the members of other classes, like this one, are done through
+// getters and setters. Thank you for allowing us to stop replacing direct accesses with getters and setters after
+// one class, in response to my email.
+
+
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -32,11 +40,9 @@ public class User {
 
             if(newUsername.length() <= 1) {
                 System.out.println("\nUsername is too short.\n");
-                attempts++;
             }
             if(users.containsKey(newUsername)) {
                 System.out.println("\nUsername already exists.\n");
-                attempts++;
             }
         } while((users.containsKey(newUsername) || newUsername.length() <= 1) && attempts < 3);
 
@@ -51,10 +57,9 @@ public class User {
         do {
             System.out.print("Enter password: ");
             newPassword = kb.nextLine();
-
+            attempts++;
             if(newPassword.length() <= 1) {
                 System.out.println("\nPassword is too short.\n");
-                attempts++;
             }
         } while(newPassword.length() <= 1 && attempts < 3);
 
@@ -148,7 +153,9 @@ public class User {
     
                 for(String user : lines) { // enters the name as a key and password as the value
                     String[] split = user.split(":");
-                    users.put(split[0], split[1]);
+                    if (split.length > 1) {
+                        users.put(split[0], split[1]);
+                    }
                 }
             } catch(IOException e) {
                 System.out.println("\nError.\n");

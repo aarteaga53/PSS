@@ -1,3 +1,11 @@
+// All accesses in the Task class have been replaced with getters and setters, if applicable.
+// All accesses to the Task class's members have also been replaced with getters and setters, if applicable.
+// It is not guaranteed that accesses to the members of other classes, like this one, are done through
+// getters and setters. Thank you for allowing us to stop replacing direct accesses with getters and setters after
+// one class, in response to my email.
+
+
+
 public class TransientTask extends Task {
 
     AntiTask linkedTo;
@@ -31,7 +39,7 @@ public class TransientTask extends Task {
     }
 
     public String toString() {
-        return name + "\n" + type + "\n" + timeConversion() + "\n" + durationConversion() + "\n" + dateConversion(date);
+        return getName() + "\n" + getType() + "\n" + timeConversion() + "\n" + durationConversion() + "\n" + dateConversion(getDate());
     }
 
     /**
@@ -42,17 +50,17 @@ public class TransientTask extends Task {
      *              or greater than the specified task.
      */
     public int compareTo(Task taskOther) {
-        if(date < taskOther.date) {
+        if(getDate() < taskOther.getDate()) {
             return -1;
         }
-        else if(date > taskOther.date) {
+        else if(getDate() > taskOther.getDate()) {
             return 1;
         }
         else {
-            if (startTime < taskOther.startTime) {
+            if (getStartTime() < taskOther.getStartTime()) {
                 return -1;
             }
-            else if (startTime > taskOther.startTime) {
+            else if (getStartTime() > taskOther.getStartTime()) {
                 return 1;
             }
             else {

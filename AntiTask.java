@@ -1,10 +1,19 @@
+// All accesses in the Task class have been replaced with getters and setters, if applicable.
+// All accesses to the Task class's members have also been replaced with getters and setters, if applicable.
+// It is not guaranteed that accesses to the members of other classes, like this one, are done through
+// getters and setters. Thank you for allowing us to stop replacing direct accesses with getters and setters after
+// one class, in response to my email.
+
+
+
 import java.util.ArrayList;
+
 
 public class AntiTask extends Task implements Cloneable {
 
     ArrayList<TransientTask> links;
     RecurringTask linkedTo;
-    
+
     public AntiTask(String name, String type, float startTime, float duration, int date) {
         super(name, type, date, startTime, duration);
         links = new ArrayList<>();
@@ -46,7 +55,7 @@ public class AntiTask extends Task implements Cloneable {
      * @param link
      * @return
      */
-    public boolean hasLink(Task link) {        
+    public boolean hasLink(Task link) {
         for(TransientTask t : links) {
             if(t == link)
                 return false;
@@ -69,7 +78,7 @@ public class AntiTask extends Task implements Cloneable {
      * Checks if there any conflicts
      */
     public boolean conflicts(Task task) {
-        if(task.date == date && overlaps(task)) {
+        if(task.getDate() == getDate() && overlaps(task)) {
             if(task.isTransient() && !hasLink(task)) {
                 if(!links.contains(task)) {
                     addLink((TransientTask) task);
@@ -84,7 +93,7 @@ public class AntiTask extends Task implements Cloneable {
     }
 
     public String toString() {
-        return name + "\n" + type + "\n" + timeConversion() + "\n" + durationConversion() + "\n" + dateConversion(date);
+        return getName() + "\n" + getType() + "\n" + timeConversion() + "\n" + durationConversion() + "\n" + dateConversion(getDate());
     }
 
     @Override

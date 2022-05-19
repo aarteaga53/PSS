@@ -1,3 +1,11 @@
+// All accesses in the Task class have been replaced with getters and setters, if applicable.
+// All accesses to the Task class's members have also been replaced with getters and setters, if applicable.
+// It is not guaranteed that accesses to the members of other classes, like this one, are done through
+// getters and setters. Thank you for allowing us to stop replacing direct accesses with getters and setters after
+// one class, in response to my email.
+
+
+
 import java.util.Scanner;
 
 public class Main {
