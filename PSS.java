@@ -22,22 +22,19 @@ public class PSS {
      * @param username
      */
     public void loadSchedule(String username) {
+        // gets filenames for all saved files the user has
         String[] schedules = dataFile.readSchedules(username);
 
         if(schedules.length > 0) {
             System.out.println("\nWould you like to load a schedule?\n\t0) Continue");
 
-            for(int i = 0; i < schedules.length; i++) {
+            for(int i = 0; i < schedules.length; i++) { // prints out all filenames to choose from
                 System.out.println("\t" + (i + 1) + ") " + schedules[i]);
             }
             
             int num = getOptionInput(0, schedules.length);
 
-            if(num <= 0) {
-                return;
-            }
-
-            if(num <= schedules.length) {
+            if(num <= schedules.length && num > 0) { // reads the tasks from the selected file
                 String filename = username + "/" + schedules[num-1];
                 dataFile.read(tasks, filename);
                 System.out.println("\nSchedule loaded.");
@@ -82,7 +79,10 @@ public class PSS {
         do {
             System.out.print("Enter option: ");
             option = kb.nextLine();
-            count++;   
+
+            if(!isValid(lower, upper, option)) {
+                count++;
+            }
         } while(!isValid(lower, upper, option) && count < 3);
 
         if(count == 3) {
@@ -94,7 +94,7 @@ public class PSS {
     }
 
     /**
-     * Checks if the option for loadSchedule() is a valid input
+     * Checks if the option for loadSchedule and exitWriteSchedule is a valid input
      * @param lower
      * @param upper
      * @param input
@@ -103,13 +103,13 @@ public class PSS {
     private boolean isValid(int lower, int upper, String input) {
         int num;
 
-        try {
+        try { // checks if the input is a number
             num = Integer.parseInt(input);
         } catch(NumberFormatException e) {
             return false;
         }
 
-        if(num >= lower && num <= upper) {
+        if(num >= lower && num <= upper) { // checks if the input is within bounds
             return true;
         }
 
@@ -117,10 +117,15 @@ public class PSS {
     }
 
     /**
-     * Creates a task based on type
+     * Creates a task based on type that user inputted
      */
     public void createTask() {
         String type = chooseType();
+
+        if(type.equals("")) {
+            return;
+        }
+
         String name = getNameInput("Enter task name: ");
 
         if(name.equals("")) {
@@ -143,10 +148,13 @@ public class PSS {
      * Gets user input for task type
      */
     private String chooseType() {
-        Task type;
+        Task type; // determines what type of task was created
         String option;
-        String prompt = "Choose task type:\n\tRecurring - Class\n\tRecurring - Study\n\tRecurring - Sleep\n\tRecurring - Exercise\n\tRecurring - Work\n\tRecurring - Meal" +
-            "\n\tTransient - Visit\n\tTransient - Shopping\n\tTransient - Appointment\n\t     Anti - Cancellation\nEnter type: ";
+        int count = 0;
+        String prompt = "\nChoose task type:\n\tRecurring - Class\n\tRecurring - Study" +
+                    "\n\tRecurring - Sleep\n\tRecurring - Exercise\n\tRecurring - Work" +
+                    "\n\tRecurring - Meal\n\tTransient - Visit\n\tTransient - Shopping" +
+                    "\n\tTransient - Appointment\n\t     Anti - Cancellation\nEnter type: ";
         
         // Gets user input for task type
         do {
@@ -154,9 +162,15 @@ public class PSS {
             option = kb.nextLine();
             type = new Task(option);
 
-            if(!type.isRecurring() && !type.isTransient() && !type.isAnti())
-                System.out.println("\nInvalid input.\n");
-        } while(!type.isRecurring() && !type.isTransient() && !type.isAnti());
+            if(!type.isRecurring() && !type.isTransient() && !type.isAnti()) {
+                count++;
+            }
+        } while(!type.isRecurring() && !type.isTransient() && !type.isAnti() && count < 3);
+
+        if(count == 3) {
+            System.out.println("\nToo many attempts.");
+            return "";
+        }
 
         return option;
     }
@@ -181,7 +195,7 @@ public class PSS {
             }
         } while(name.length() <= 1 && count < 3);
 
-        if(count == 3 && name.length() <= 1) {
+        if(count == 3) {
             System.out.println("\nToo many attempts.");
             return "";
         }
@@ -208,10 +222,13 @@ public class PSS {
         do {
             System.out.print(prompt);
             startTime = kb.nextLine();
-            count++;
+
+            if(!isStartTimeCorrect(startTime)) {
+                count++;
+            }
         } while(!isStartTimeCorrect(startTime) && count < 3);
 
-        if(count == 3 && !isStartTimeCorrect(startTime)) {
+        if(count == 3) {
             System.out.println("\nToo many attempts.");
             return "";
         }
@@ -232,10 +249,13 @@ public class PSS {
         do {
             System.out.print(prompt);
             duration = kb.nextLine();
-            count++;
+
+            if(!isDurationCorrect(duration)) {
+                count++;
+            }
         } while(!isDurationCorrect(duration) && count < 3);
 
-        if(count == 3 && !isDurationCorrect(duration)) {
+        if(count == 3) {
             System.out.println("\nToo many attempts.");
             return "";
         }
@@ -256,10 +276,13 @@ public class PSS {
         do {
             System.out.print(prompt);
             startDate = kb.nextLine();
-            count++;
+
+            if(!isDateCorrect(startDate)) {
+                count++;
+            }
         } while(!isDateCorrect(startDate) && count < 3);
 
-        if(count == 3 && !isDateCorrect(startDate)) {
+        if(count == 3) {
             System.out.println("\nToo many attempts.");
             return "";
         }
@@ -281,10 +304,13 @@ public class PSS {
         do {
             System.out.print(prompt);
             endDate = kb.nextLine();
-            count++;
+
+            if(!isEndDateCorrect(startDate, endDate)) {
+                count++;
+            }
         } while(!isEndDateCorrect(startDate, endDate) && count < 3);
 
-        if(count == 3 && !isEndDateCorrect(startDate, endDate)) {
+        if(count == 3) {
             System.out.println("\nToo many attempts.");
             return "";
         }
@@ -305,10 +331,14 @@ public class PSS {
         do {
             System.out.print(prompt);
             frequency = kb.nextLine();
-            count++;
+
+            if(!isFrequencyCorrect(frequency)) {
+                count++;
+
+            }
         } while(!isFrequencyCorrect(frequency) && count < 3);
 
-        if(count == 3 && !isFrequencyCorrect(frequency)) {
+        if(count == 3) {
             System.out.println("\nToo many attempts.");
             return "";
         }
@@ -443,34 +473,35 @@ public class PSS {
      * @return
      */
     private boolean conflicts(Task newTask) {
-        boolean recurringPresent = false;
-
         for(Task task : tasks) {
             if(newTask == task) {
                 continue;
             }
-            if(task.isRecurring()) {
-                recurringPresent = true;
-            }
-            if(!task.conflicts(newTask) && newTask.isAnti()) {
-                return false;
-            }
-            if(task.conflicts(newTask) && !newTask.isAnti()) {
-                if(newTask.isTransient()) {
-                    TransientTask t = (TransientTask) newTask;
-    
-                    if(t.isLinkedTo()) {
-                        AntiTask a = t.getLinkedTo();
-    
-                        a.removeLink(t);
+            if(newTask.isAnti()) { // checks if the newTask is anti and only compares it to recurring tasks
+                if(task.isRecurring()) {
+                    if(!task.conflicts(newTask)) {
+                        return false;
                     }
                 }
-                return true;
+            }
+            else { // non anti tasks are compared to every other task
+                if(task.conflicts(newTask)) {
+                    if(newTask.isTransient()) {
+                        TransientTask t = (TransientTask) newTask;
+        
+                        if(t.isLinkedTo()) {
+                            AntiTask a = t.getLinkedTo();
+        
+                            a.removeLink(t);
+                        }
+                    }
+                    return true;
+                }
             }
         }
 
         // if no recurring tasks were found then anti cannot be created
-        if(newTask.isAnti() && !recurringPresent) {
+        if(newTask.isAnti()) {
             return true;
         }
             
@@ -484,10 +515,11 @@ public class PSS {
      * @return
      */
     private boolean isEndDateCorrect(String startDate, String endDate) {
-        if(!isDateCorrect(endDate)) {
+        if(!isDateCorrect(endDate)) { // checks that the end date is properly formatted
             return false;
         }
 
+        // checks that the end date is later than the start date
         return dateConversion(endDate) > dateConversion(startDate);
     }
 
@@ -499,13 +531,13 @@ public class PSS {
     private boolean isFrequencyCorrect(String frequency) {
         int freq;
 
-        try {
+        try { // checks that the frequency is a number
             freq = Integer.parseInt(frequency);
         } catch(NumberFormatException e) {
             return false;
         }
 
-        if(freq != 1 && freq != 7) {
+        if(freq != 1 && freq != 7) { // checks that it is 1 or 7
             return false;
         }
 
@@ -526,7 +558,7 @@ public class PSS {
             return false;
         }
 
-        try {
+        try { // checks that it is numbers
             String[] split = duration.split(":");
             hour = Integer.parseInt(split[0]);
             minute = Integer.parseInt(split[1]);
@@ -534,6 +566,7 @@ public class PSS {
             return false;
         }
 
+        // checks that the hour and minute are proper
         if(hour > 23 || hour < 0) {
             return false;
         }
@@ -565,7 +598,7 @@ public class PSS {
             return false;
         }
 
-        try {
+        try { // checks that they are numbers
             String[] split = startTime.split("[: ]");
             hour = Integer.parseInt(split[0]);
             minute = Integer.parseInt(split[1]);
@@ -574,6 +607,7 @@ public class PSS {
             return false;
         }
         
+        // checks that the hour and minute are correct, and it is am or pm
         if(hour > 12 || hour < 1) {
             return false;
         }
@@ -602,7 +636,7 @@ public class PSS {
             return false;
         }
 
-        try {
+        try { // checks that they are numbers
             String[] split = date.split("/");
             month = Integer.parseInt(split[0]);
             day = Integer.parseInt(split[1]);
@@ -611,6 +645,7 @@ public class PSS {
             return false;
         }
 
+        // checks that the day falls within the month, and month falls within the year
         if(month > 12 || month < 1) {
             return false;
         }
@@ -623,7 +658,7 @@ public class PSS {
         else if((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) {
             return false;
         }
-        else if(month == 2) {
+        else if(month == 2) { // checks for leap year
             if(year % 4 == 0) {
                 if(year % 100 == 0) {
                     if(year % 400 == 0 && day > 29) {
@@ -643,14 +678,13 @@ public class PSS {
     }
 
     /**
-     * Converts the string date into int representation
+     * Converts the string date into integer representation
      * @param date
      * @return
      */
     private int dateConversion(String date) {
         String[] split = date.split("/");
         return Integer.parseInt(split[2] + split[0] + split[1]);
-        
     }
 
     /**
@@ -674,6 +708,7 @@ public class PSS {
         float hour = Float.parseFloat(t[0]);
         float minute = Float.parseFloat(t[1]);
 
+        // converts the time to 24 hour
         if((t[2].equals("am") && hour != 12) || (t[2].equals("pm") && hour == 12)) {
             startTime += hour;
         }
@@ -690,6 +725,7 @@ public class PSS {
      * @return
      */
     private float minute(float minute) {
+        // increases to the nearest 15 minutes
         if(minute <= 15 && minute > 0) {
             return (float) 0.25;
         }
@@ -749,7 +785,7 @@ public class PSS {
         List<Task> candidatesForDeletion = new ArrayList<Task>();
         ArrayList<AntiTask> linksToDelete = new ArrayList<>();
 
-        for(Task task : tasks) {
+        for(Task task : tasks) { // looks for the task
             if(task.getName().equals(name)) {
                 if(task.isAnti()) {
                     AntiTask temp = (AntiTask) task;
@@ -810,8 +846,7 @@ public class PSS {
                 viewTask(name); // should print multiple tasks with the same name.
 
                 System.out.println("\nAbove are the tasks with that name.");
-                String dateInput = getDateInput("Input the date of the task you want deleted (mm/dd/yyyy): ");
-                int date = dateConversion(dateInput);
+                int date = Integer.parseInt(getDateInput("Input the date of the task you want deleted (mm/dd/yyyy): "));
 
                 for (Task task : candidatesForDeletion) {
                     if (task.getDate() == date) {
@@ -965,6 +1000,7 @@ public class PSS {
                                 String newDate = getDateInput("Enter new date(mm/dd/yyyy): ");
 
                                 if(!newDate.equals("")) {
+
                                     task.setDate(dateConversion(newDate));
                                 }
                                 if(conflicts(task)) {
@@ -1144,7 +1180,6 @@ public class PSS {
      */
     public void writeSchedule(String username) {
         writeSchedule(username, tasks);
-        isSaved = true;
     }
 
     /**
@@ -1152,10 +1187,9 @@ public class PSS {
      * @param username
      * @param schedule  The schedule that is to be written to a file.
      */
-    public void writeSchedule(String username, List<Task> schedule) {
+    private void writeSchedule(String username, List<Task> schedule) {
         String filepath = username + "/";
         String filename = getFilename();
-        Collections.sort(schedule);
 
         if(filename.equals("")) {
             return;
@@ -1169,10 +1203,13 @@ public class PSS {
             if(kb.nextLine().toLowerCase().charAt(0) == 'y') {
                 dataFile.write(schedule, filepath + filename);
                 System.out.println("\nSchedule saved.");
+                isSaved = true;
             }
         }
         else {
             dataFile.write(schedule, filepath + filename);
+            System.out.println("\nSchedule saved.");
+            isSaved = true;
         }
     }
 
@@ -1191,7 +1228,6 @@ public class PSS {
         // checks if the file exists
         if(new File(filepath + filename).exists()) {
             dataFile.read(tasks, filepath + filename);
-            Collections.sort(tasks);
             System.out.println("\nSchedule read.");
         }
         else {
@@ -1211,14 +1247,14 @@ public class PSS {
         do {
             System.out.print("Enter filename: ");
             filename = kb.nextLine();
-            count++;
 
             if(!filename.contains(".json")) {
                 System.out.println("\nMust be JSON file.");
+                count++;
             }
         } while(!filename.contains(".json") && count < 3);
 
-        if(count == 3 && !filename.contains(".json")) {
+        if(count == 3) {
             System.out.println("\nToo many attempts.");
             return "";
         }
@@ -1240,7 +1276,7 @@ public class PSS {
         int date = dateConversion(startDate);
         ArrayList<Task> tasksInDay = getTasksInPeriod(date, 1);
 
-        for (Task task : tasksInDay) {
+        for (Task task : tasksInDay) { // prints the tasks in the given day
             System.out.println("\n" + task.toString());
         }
     }
@@ -1259,7 +1295,7 @@ public class PSS {
         int date = dateConversion(startDate);
         ArrayList<Task> tasksInWeek = getTasksInPeriod(date, 7);
 
-        for (Task task : tasksInWeek) {
+        for (Task task : tasksInWeek) { // prints the tasks in the given week
             System.out.println("\n" + task.toString());
         }
     }
@@ -1278,7 +1314,7 @@ public class PSS {
         int date = dateConversion(startDate);
         ArrayList<Task> tasksInMonth = getTasksInPeriod(date, 30);
 
-        for (Task task : tasksInMonth) {
+        for (Task task : tasksInMonth) { // prints the tasks in the given month
             System.out.println("\n" + task.toString());
         }
     }
@@ -1296,8 +1332,7 @@ public class PSS {
         }
 
         int date = dateConversion(startDate);
-        int day = 1;
-        ArrayList<Task> tasksInDay = getTasksInPeriod(date, day);
+        ArrayList<Task> tasksInDay = getTasksInPeriod(date, 1);
         writeSchedule(username, tasksInDay);
     }
 
@@ -1314,8 +1349,7 @@ public class PSS {
         }
 
         int date = dateConversion(startDate);
-        int week = 7;
-        ArrayList<Task> tasksInWeek = getTasksInPeriod(date, week);
+        ArrayList<Task> tasksInWeek = getTasksInPeriod(date, 7);
         writeSchedule(username, tasksInWeek);
     }
 
@@ -1332,8 +1366,7 @@ public class PSS {
         }
 
         int date = dateConversion(startDate);
-        int month = 30;
-        ArrayList<Task> tasksInMonth = getTasksInPeriod(date, month);
+        ArrayList<Task> tasksInMonth = getTasksInPeriod(date, 30);
         writeSchedule(username, tasksInMonth);
     }
 
@@ -1349,18 +1382,18 @@ public class PSS {
         int next = date;
         int count = 0;
 
-        while(count < durationInDays) {
+        while(count < durationInDays) { // iterates for duration in days
             for(Task task : getTasksInDay(day)) {
                 tasksInPeriod.add(task);
             }
 
-            next = day.nextDate(next, 1);
+            next = day.nextDate(next, 1); // gets the next day
             day.setDate(next);
             day.setEndDate(next);
             count++;
         }
 
-        Collections.sort(tasksInPeriod);
+        Collections.sort(tasksInPeriod); // sorts the tasks
 
         return tasksInPeriod;
     }
@@ -1373,6 +1406,7 @@ public class PSS {
     private ArrayList<Task> getTasksInDay(RecurringTask day) {
         ArrayList<Task> tasksInDay = new ArrayList<Task>();
 
+        // checks if any tasks conflict with the day
         for(Task task : tasks) {
             if (day.conflicts(task)) {
                 if(task.isRecurring()) {
@@ -1380,7 +1414,7 @@ public class PSS {
                     TransientTask t = new TransientTask(temp.getName(), temp.getType(), temp.getStartTime(), temp.getDuration(), day.getDate());
                     ArrayList<AntiTask> links = temp.getLinks();
 
-                    if(links.size() > 0) {
+                    if(links.size() > 0) { // if the recurring task has an anti link it will not be added
                         for(AntiTask a : links) {
                             if(!day.conflicts(a)) {
                                 tasksInDay.add(t);
@@ -1391,7 +1425,7 @@ public class PSS {
                         tasksInDay.add(t);
                     }
                 }
-                else if(task.isTransient()) {
+                else if(task.isTransient()) { // transient tasks is always added
                     tasksInDay.add(task);
                 }
             }

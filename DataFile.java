@@ -64,39 +64,46 @@ public class DataFile {
                 if(line.equals("  },") || line.equals("  }")) {
                     Task newTask = new Task(type);
 
-                    if(newTask.isRecurring() && count == 7) {
+                    if(newTask.isRecurring() && count == 7) { // creates a recurring
                         newTask = new RecurringTask(name, type, startTime, duration, date, endDate, frequency);
                     }  
-                    else if(newTask.isTransient() || (newTask.isRecurring() && count == 5)) {
+                    else if(newTask.isTransient() || (newTask.isRecurring() && count == 5)) { // creates a transient
                         newTask = new TransientTask(name, type, startTime, duration, date);
                     }
-                    else if(newTask.isAnti()) {
+                    else if(newTask.isAnti()) { // creates an anti
                         newTask = new AntiTask(name, type, startTime, duration, date);
                     }
 
+                    // checks that the task is of recurring, transient, or anti
                     if(newTask.isRecurring() || newTask.isTransient() || newTask.isAnti()) {
                         int i;
 
                         // checks that there is no conflicts with tasks
                         for(i = 0; i < tasks.size(); i++) {
-                            if(!tasks.get(i).conflicts(newTask) && newTask.isAnti()) {
-                                continue;
-                            }
-                            else if (tasks.get(i).conflicts(newTask) && !newTask.isAnti()) {
-                                if(newTask.isTransient()) {
-                                    TransientTask t = (TransientTask) newTask;
-                    
-                                    if(t.isLinkedTo()) {
-                                        AntiTask a = t.getLinkedTo();
-                    
-                                        a.removeLink(t);
+                            if(newTask.isAnti()) {
+                                if(tasks.get(i).isRecurring()) {
+                                    if(!tasks.get(i).conflicts(newTask)) {
+                                        continue;
                                     }
                                 }
-                                break;
+                            }
+                            else {
+                                if(tasks.get(i).conflicts(newTask)) {
+                                    if(newTask.isTransient()) {
+                                        TransientTask t = (TransientTask) newTask;
+                        
+                                        if(t.isLinkedTo()) {
+                                            AntiTask a = t.linkedTo;
+                        
+                                            a.removeLink(t);
+                                        }
+                                    }
+                                    break;
+                                }
                             }
                         }
 
-                        // adds a new task if it is not a repeat
+                        // if the task does not conflict it is added to the schedule
                         if(i == tasks.size()) {
                             tasks.add(newTask);
                         }
@@ -107,23 +114,23 @@ public class DataFile {
 
                     count = 0;
                 }
-                else {
+                else { // Reads the next line and assigns the value to the according variable of the task
                     String[] split = line.split(" : ");
 
                     // checks key and reads the value
-                    if(split[0].equals("    \"Name\"")) {
+                    if(split[0].equals("    \"Name\"")) { // name value
                         name = split[1].substring(split[1].indexOf("\"") + 1, split[1].lastIndexOf("\""));
                     }
-                    else if(split[0].equals("    \"Type\"")) {
+                    else if(split[0].equals("    \"Type\"")) { // type value
                         type = split[1].substring(split[1].indexOf("\"") + 1, split[1].lastIndexOf("\""));
                     }
-                    else if(split[0].equals("    \"StartDate\"") || split[0].equals("    \"Date\"")) {
+                    else if(split[0].equals("    \"StartDate\"") || split[0].equals("    \"Date\"")) { // date value
                         date = Integer.parseInt(split[1].substring(0, split[1].indexOf(",")));
                     }
-                    else if(split[0].equals("    \"StartTime\"")) {
+                    else if(split[0].equals("    \"StartTime\"")) { // start time value
                         startTime = Float.parseFloat(split[1].substring(0, split[1].indexOf(",")));
                     }
-                    else if(split[0].equals("    \"Duration\"")) {
+                    else if(split[0].equals("    \"Duration\"")) { // duration value
                         if(split[1].indexOf(",") < 0) {
                             duration = Float.parseFloat(split[1]);
                         }
@@ -131,10 +138,10 @@ public class DataFile {
                             duration = Float.parseFloat(split[1].substring(0, split[1].indexOf(",")));
                         }
                     }  
-                    else if(split[0].equals("    \"EndDate\"")) {
+                    else if(split[0].equals("    \"EndDate\"")) { // end date value
                         endDate = Integer.parseInt(split[1].substring(0, split[1].indexOf(",")));
                     }
-                    else if(split[0].equals("    \"Frequency\"")) {
+                    else if(split[0].equals("    \"Frequency\"")) { // frequency value
                         frequency = Integer.parseInt(split[1]);
                     }
 

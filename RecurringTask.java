@@ -143,6 +143,9 @@ public class RecurringTask extends Task implements Cloneable {
 
     /**
      * Increments the date by the frequency, 1 or 7 days
+     * The day adjusts to the amount of days in the month if it goes over and increments the month
+     * The month readjusts if it is a new year
+     * Leap year is accounted for
      * @param next
      * @param freq
      * @return
@@ -154,6 +157,7 @@ public class RecurringTask extends Task implements Cloneable {
 
         day += freq;
 
+        // checks for months with 31 days
         if((month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) && day > 31) {
             if(month == 12) {
                 year++;
@@ -165,11 +169,12 @@ public class RecurringTask extends Task implements Cloneable {
 
             day -= 31;
         }
+        // checks for months with 30 days
         else if((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) {
             month++;
             day -= 30;
         }
-        else if(month == 2) {
+        else if(month == 2) { // checks for leap year
             if(year % 4 == 0) {
                 if(year % 100 == 0) {
                     if(year % 400 == 0 && day > 29) {
