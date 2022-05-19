@@ -32,9 +32,11 @@ public class User {
 
             if(newUsername.length() <= 1) {
                 System.out.println("\nUsername is too short.\n");
+                attempts++;
             }
             if(users.containsKey(newUsername)) {
                 System.out.println("\nUsername already exists.\n");
+                attempts++;
             }
         } while((users.containsKey(newUsername) || newUsername.length() <= 1) && attempts < 3);
 
@@ -49,10 +51,10 @@ public class User {
         do {
             System.out.print("Enter password: ");
             newPassword = kb.nextLine();
-            attempts++;
 
             if(newPassword.length() <= 1) {
                 System.out.println("\nPassword is too short.\n");
+                attempts++;
             }
         } while(newPassword.length() <= 1 && attempts < 3);
 
@@ -74,40 +76,37 @@ public class User {
         String newUsername;
         String newPassword;
         int attempts = 0;
-        boolean success = false;
 
         // gets username that must exist, 3 attempts are given to user
         do {
             System.out.print("Enter username: ");
             newUsername = kb.nextLine();
-            attempts++;
 
-            success = users.containsKey(newUsername);
-            if(!success) {
+            if(!users.containsKey(newUsername)) {
                 System.out.println("\nUsername does not exist.\n");
+                attempts++;
             }
-        } while(!success && attempts < 3);
+        } while(!users.containsKey(newUsername) && attempts < 3);
 
-        if(!success && attempts == 3) {
+        if(attempts == 3) {
             System.out.println("\nToo many attempts.");
             return;
         }
 
-        success = false;
         attempts = 0;
+
         // gets password that must match username password, 3 attempts are given to user
         do {
             System.out.print("Enter password: ");
             newPassword = kb.nextLine();
-            attempts++;
 
-            success = users.get(newUsername).equals(newPassword);
-            if(!success) {
+            if(!users.get(newUsername).equals(newPassword)) {
                 System.out.println("\nIncorrect password.\n");
+                attempts++;
             }
-        } while(!success && attempts < 3);
+        } while(!users.get(newUsername).equals(newPassword) && attempts < 3);
 
-        if(!success && attempts == 3) {
+        if(attempts == 3) {
             System.out.println("\nToo many attempts.");
             return;
         }
@@ -124,7 +123,7 @@ public class User {
     private void addUser(String newUsername, String newPassword) {
         File file = new File("users.txt");
 
-        try {
+        try { // writes the new user to the users file
             FileWriter fw = new FileWriter(file, true);
             fw.append(newUsername + ":" + newPassword + "\n");
             fw.close();
@@ -147,7 +146,7 @@ public class User {
                 Path filePath = Paths.get("users.txt");
                 List<String> lines = Files.readAllLines(filePath);
     
-                for(String user : lines) {
+                for(String user : lines) { // enters the name as a key and password as the value
                     String[] split = user.split(":");
                     users.put(split[0], split[1]);
                 }
@@ -155,9 +154,8 @@ public class User {
                 System.out.println("\nError.\n");
             }
         }
-        System.out.print("test");
+
         return users;
     }
 
 }
-//teweet
