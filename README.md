@@ -1,2 +1,2 @@
-# PSS
-CS3560 Group Project - PSS
+# PSS - Personal Scheduling Service
+CS3560 Group Project
