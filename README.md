@@ -2,6 +2,7 @@
 CS3560 Group Project
 ## Description
 A tool to assist users in scheduling activities/tasks.
+
 Each task has:
 - User-defined name
 - Type that defines the task
